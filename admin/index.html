@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Reklama boshqaruvi — Yangi Alifbo</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230b3a6e'/%3E%3Crect x='12' y='20' width='40' height='26' rx='4' fill='none' stroke='white' stroke-width='3.5'/%3E%3Cpath d='M20 29h.1M28 29h.1M36 29h.1M44 29h.1M24 38h16' stroke='white' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="admin.css">
+  <script>
+    try {
+      var s = JSON.parse(localStorage.getItem('ya_settings') || '{}');
+      if (s.theme) document.documentElement.setAttribute('data-theme', s.theme);
+    } catch (e) {}
+  </script>
+</head>
+<body class="admin">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M8 13h.01M12 13h.01M16 13h.01M7 16h10"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></symbol>
+    <symbol id="i-text" viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 18h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><path d="M14 2v6h6"/></symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/></symbol>
+  </svg>
+
+  <header class="masthead">
+    <div class="container masthead-inner">
+      <a class="brand" href="../" title="Saytga qaytish">
+        <span class="emblem"><svg class="i"><use href="#i-keyboard"/></svg></span>
+        <span class="brand-text">
+          <b>YANGI ALIFBO</b>
+          <small>Reklama boshqaruv paneli</small>
+        </span>
+      </a>
+      <div class="util">
+        <a class="btn admin-head-btn" href="../" target="_blank" rel="noopener"><svg class="i"><use href="#i-left"/></svg><span>Saytni ochish</span></a>
+        <button class="btn admin-head-btn" id="logoutBtn" hidden><svg class="i"><use href="#i-logout"/></svg><span>Chiqish</span></button>
+      </div>
+    </div>
+  </header>
+  <div class="flagline" aria-hidden="true"></div>
+
+  <main class="container admin-main">
+    <div class="page-head">
+      <h1>Reklama boshqaruvi</h1>
+      <p>Saytdagi reklama joylarini boshqaring. Reklama joylanmagan yoki oʻchirilgan boʻlsa, saytda reklama joyi umuman koʻrinmaydi.</p>
+    </div>
+
+    <div class="mode-box" id="modeBox" hidden></div>
+
+    <!-- Kirish -->
+    <div class="box login-card" id="loginCard" hidden>
+      <span class="login-icon"><svg class="i"><use href="#i-lock"/></svg></span>
+      <h2>Boshqaruv paneliga kirish</h2>
+      <p class="muted">Davom etish uchun administrator parolini kiriting.</p>
+      <form id="loginForm" autocomplete="on">
+        <input type="text" name="username" value="admin" autocomplete="username" hidden>
+        <label class="field">
+          <span>Parol</span>
+          <input type="password" id="loginPassword" class="input" autocomplete="current-password" required>
+        </label>
+        <p class="form-error" id="loginError" hidden></p>
+        <button class="btn primary" type="submit"><svg class="i"><use href="#i-lock"/></svg><span>Kirish</span></button>
+      </form>
+    </div>
+
+    <!-- Ish maydoni -->
+    <div class="workspace" id="workspace" hidden>
+      <aside class="card ad-list-card">
+        <div class="card-head">
+          <h3><svg class="i"><use href="#i-megaphone"/></svg>Reklamalar</h3>
+          <button class="btn small primary" id="addBtn"><svg class="i"><use href="#i-plus"/></svg><span>Yangi</span></button>
+        </div>
+        <ul class="ad-list" id="adList"></ul>
+        <div class="slots-info">
+          <b>Reklama joylari</b>
+          <span><i class="slot-dot"></i>Sahifa tepasi — menyu ostida</span>
+          <span><i class="slot-dot"></i>Sahifa pasti — asosiy qismdan keyin</span>
+          <span class="muted">Bitta joyga bir nechta faol reklama qoʻyilsa, har safar ulardan biri tasodifiy koʻrsatiladi.</span>
+        </div>
+      </aside>
+
+      <section class="editor-col">
+        <div class="card empty-state" id="emptyState">
+          <svg class="i"><use href="#i-megaphone"/></svg>
+          <h3>Reklama tanlanmagan</h3>
+          <p class="muted">Chap tomondagi roʻyxatdan reklamani tanlang yoki yangisini qoʻshing.</p>
+          <button class="btn primary" id="addBtn2"><svg class="i"><use href="#i-plus"/></svg><span>Yangi reklama qoʻshish</span></button>
+        </div>
+
+        <form class="card ad-form" id="adForm" hidden autocomplete="off">
+          <div class="card-head">
+            <h3 id="formTitle">Reklama</h3>
+            <div class="form-head-actions">
+              <button type="button" class="btn small" id="dupBtn" title="Nusxa yaratish"><svg class="i"><use href="#i-copy"/></svg><span>Nusxa</span></button>
+              <button type="button" class="btn small danger" id="delBtn" title="Oʻchirish"><svg class="i"><use href="#i-trash"/></svg><span>Oʻchirish</span></button>
+            </div>
+          </div>
+
+          <div class="form-body">
+            <div class="row">
+              <label class="field grow">
+                <span>Nomi (faqat panelda koʻrinadi)</span>
+                <input type="text" class="input" id="f-name" maxlength="80" placeholder="Masalan: Bahorgi aksiya banneri">
+              </label>
+              <label class="switch">
+                <input type="checkbox" id="f-enabled">
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+                <span class="switch-label">Faol</span>
+              </label>
+            </div>
+
+            <fieldset class="group">
+              <legend>Joylashuv</legend>
+              <div class="choice-grid" id="f-slot">
+                <label class="choice"><input type="radio" name="slot" value="top"><span class="choice-mock mock-top"><i></i><i></i><i></i></span><b>Sahifa tepasi</b><small>Menyu ostida, sarlavhadan oldin</small></label>
+                <label class="choice"><input type="radio" name="slot" value="bottom"><span class="choice-mock mock-bottom"><i></i><i></i><i></i></span><b>Sahifa pasti</b><small>Asosiy qismdan keyin, pastki qism oldidan</small></label>
+              </div>
+              <div class="row wrap">
+                <div class="field grow">
+                  <span>Qaysi boʻlimlarda</span>
+                  <div class="checks-row" id="f-pages">
+                    <label class="check"><input type="checkbox" value="all"> Barcha boʻlimlar</label>
+                    <label class="check"><input type="checkbox" value="converter"> Konvertor</label>
+                    <label class="check"><input type="checkbox" value="editor"> Klaviatura</label>
+                    <label class="check"><input type="checkbox" value="trainer"> Mashq</label>
+                    <label class="check"><input type="checkbox" value="alphabet"> Alifbo</label>
+                  </div>
+                </div>
+                <label class="field">
+                  <span>Qurilma</span>
+                  <select id="f-device">
+                    <option value="all">Barcha qurilmalar</option>
+                    <option value="desktop">Faqat kompyuter</option>
+                    <option value="mobile">Faqat telefon</option>
+                  </select>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="group">
+              <legend>Muddat va sozlamalar</legend>
+              <div class="row wrap">
+                <label class="field">
+                  <span>Boshlanish sanasi</span>
+                  <input type="date" class="input" id="f-start">
+                </label>
+                <label class="field">
+                  <span>Tugash sanasi</span>
+                  <input type="date" class="input" id="f-end">
+                </label>
+                <label class="check self-end"><input type="checkbox" id="f-closable"> Foydalanuvchi reklamani yopa olsin</label>
+              </div>
+              <p class="hint-sm">Sanalar boʻsh qoldirilsa, reklama muddatsiz koʻrsatiladi.</p>
+            </fieldset>
+
+            <fieldset class="group">
+              <legend>Reklama turi va mazmuni</legend>
+              <div class="seg type-seg" id="f-type" role="radiogroup">
+                <button type="button" data-type="image"><svg class="i"><use href="#i-image"/></svg>Rasm (banner)</button>
+                <button type="button" data-type="text"><svg class="i"><use href="#i-text"/></svg>Matnli eʼlon</button>
+                <button type="button" data-type="html"><svg class="i"><use href="#i-code"/></svg>HTML kod</button>
+              </div>
+
+              <div class="type-pane" data-pane="image">
+                <div class="img-field">
+                  <label class="field grow">
+                    <span>Asosiy rasm (kompyuter uchun) — tavsiya: 1200×200 yoki 970×250 px</span>
+                    <input type="text" class="input" id="f-image" placeholder="https://… yoki yuklang">
+                  </label>
+                  <label class="btn upload-btn"><svg class="i"><use href="#i-upload"/></svg><span>Yuklash</span><input type="file" accept="image/png,image/jpeg,image/gif,image/webp" data-target="f-image" hidden></label>
+                </div>
+                <div class="img-field">
+                  <label class="field grow">
+                    <span>Telefon uchun rasm (ixtiyoriy) — tavsiya: 640×200 px</span>
+                    <input type="text" class="input" id="f-imageMobile" placeholder="Boʻsh qolsa, asosiy rasm ishlatiladi">
+                  </label>
+                  <label class="btn upload-btn"><svg class="i"><use href="#i-upload"/></svg><span>Yuklash</span><input type="file" accept="image/png,image/jpeg,image/gif,image/webp" data-target="f-imageMobile" hidden></label>
+                </div>
+                <label class="field">
+                  <span>Rasm tavsifi (alt matn)</span>
+                  <input type="text" class="input" id="f-alt" maxlength="150" placeholder="Masalan: Kitob doʻkoni — 20% chegirma">
+                </label>
+              </div>
+
+              <div class="type-pane" data-pane="text">
+                <label class="field">
+                  <span>Sarlavha</span>
+                  <input type="text" class="input" id="f-title" maxlength="100" placeholder="Masalan: Ingliz tili kurslari">
+                </label>
+                <label class="field">
+                  <span>Matn</span>
+                  <textarea class="input" id="f-text" rows="3" maxlength="400" placeholder="Qisqa tavsif…"></textarea>
+                </label>
+                <label class="field">
+                  <span>Tugma yozuvi (ixtiyoriy)</span>
+                  <input type="text" class="input" id="f-button" maxlength="30" placeholder="Masalan: Batafsil">
+                </label>
+              </div>
+
+              <div class="type-pane" data-pane="link">
+                <label class="field">
+                  <span>Havola (reklama bosilganda ochiladigan manzil)</span>
+                  <input type="text" class="input" id="f-link" placeholder="https://…">
+                </label>
+              </div>
+
+              <div class="type-pane" data-pane="html">
+                <label class="field">
+                  <span>Reklama kodi (Google AdSense, Yandex RTB yoki boshqa tarmoq bergan kod)</span>
+                  <textarea class="input mono" id="f-html" rows="8" spellcheck="false" placeholder="<script async src=&quot;…&quot;></script>&#10;<ins class=&quot;adsbygoogle&quot; …></ins>"></textarea>
+                </label>
+                <p class="hint-sm warn"><svg class="i"><use href="#i-alert"/></svg>Bu kod saytda oʻzgarishsiz ishga tushadi. Faqat ishonchli reklama tarmoqlaridan olingan kodni joylang.</p>
+              </div>
+            </fieldset>
+          </div>
+        </form>
+
+        <div class="card preview-card" id="previewCard" hidden>
+          <div class="card-head">
+            <h3>Koʻrinishi</h3>
+            <div class="seg small-seg" id="previewMode">
+              <button type="button" data-mode="desktop" class="active"><svg class="i"><use href="#i-monitor"/></svg>Kompyuter</button>
+              <button type="button" data-mode="mobile"><svg class="i"><use href="#i-phone"/></svg>Telefon</button>
+            </div>
+          </div>
+          <div class="preview-stage">
+            <div class="mock-page" id="mockPage">
+              <div class="mock-head"></div>
+              <div class="mock-nav"></div>
+              <div class="mock-body">
+                <div class="mock-slot" id="mockTop"></div>
+                <div class="mock-block"></div>
+                <div class="mock-block short"></div>
+                <div class="mock-slot" id="mockBottom"></div>
+              </div>
+              <div class="mock-foot"></div>
+            </div>
+          </div>
+          <p class="preview-note" id="previewNote"></p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Saqlash paneli -->
+  <div class="savebar" id="saveBar" hidden>
+    <div class="container savebar-inner">
+      <span class="save-state" id="saveState"></span>
+      <div class="savebar-actions">
+        <label class="btn" title="ads.json faylidan yuklash"><svg class="i"><use href="#i-file"/></svg><span>Fayldan yuklash</span><input type="file" id="importFile" accept=".json,application/json" hidden></label>
+        <button class="btn" id="exportBtn"><svg class="i"><use href="#i-download"/></svg><span>ads.json yuklab olish</span></button>
+        <button class="btn primary" id="saveBtn" hidden><svg class="i"><use href="#i-save"/></svg><span>Saytga saqlash</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../js/ads.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

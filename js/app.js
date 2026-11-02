@@ -89,7 +89,10 @@
 
   function downloadText(text, name) {
     if (!text) { toast('Matn boʻsh', 'info'); return; }
-    var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    downloadBlob(new Blob([text], { type: 'text/plain;charset=utf-8' }), name);
+  }
+
+  function downloadBlob(blob, name) {
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = name;
@@ -98,13 +101,40 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
   }
 
+  /*
+   * Faylni o'qish: .txt — matn sifatida, .docx — Word hujjat sifatida.
+   * cb(text, docx) — docx: { name, size, buffer } yoki null
+   */
+  function readAnyFile(f, cb) {
+    if (!f) return;
+    if (window.UzDocx.isDocName(f.name)) {
+      toast('Eski .doc formati qoʻllab-quvvatlanmaydi. Word dasturida “.docx” sifatida saqlang', 'error');
+      return;
+    }
+    if (f.size > 50 * 1024 * 1024) { toast('Fayl juda katta (50 MB dan ortiq)', 'error'); return; }
+    var r = new FileReader();
+    r.onerror = function () { toast('Faylni oʻqib boʻlmadi', 'error'); };
+    if (window.UzDocx.isDocxName(f.name)) {
+      r.onload = function () {
+        var buf = r.result;
+        window.UzDocx.extractText(buf).then(function (text) {
+          cb(text, { name: f.name, size: f.size, buffer: buf });
+        }, function (err) {
+          toast(err && err.message === 'old-doc'
+            ? 'Bu eski .doc formatidagi fayl. Word dasturida “.docx” sifatida saqlang'
+            : 'Word faylni ochib boʻlmadi', 'error');
+        });
+      };
+      r.readAsArrayBuffer(f);
+    } else {
+      r.onload = function () { cb(String(r.result), null); };
+      r.readAsText(f, 'utf-8');
+    }
+  }
   function readFile(input, cb) {
     var f = input.files && input.files[0];
-    if (!f) return;
-    var r = new FileReader();
-    r.onload = function () { cb(String(r.result)); input.value = ''; };
-    r.onerror = function () { toast('Faylni oʻqib boʻlmadi', 'error'); };
-    r.readAsText(f, 'utf-8');
+    input.value = '';
+    readAnyFile(f, cb);
   }
 
   /* ---------------- Modallar ---------------- */
@@ -229,7 +259,12 @@
 
   $('copyBtn').onclick = function () { copyText(editor.value); };
   $('downloadBtn').onclick = function () { downloadText(editor.value, 'matn.txt'); };
-  $('openFile').onchange = function () { readFile(this, function (t) { replaceEditorText(t); toast('Fayl ochildi'); }); };
+  $('openFile').onchange = function () {
+    readFile(this, function (t, docx) {
+      replaceEditorText(t);
+      toast(docx ? 'Word hujjat matni ochildi' : 'Fayl ochildi');
+    });
+  };
   $('fixBtn').onclick = function () {
     var before = editor.value;
     var after = S.layout === 'kirill' ? before : C.normalizeApostrophes(before);
@@ -517,6 +552,10 @@
     }
   }
   convIn.addEventListener('input', function () {
+    if (docx && !docx.edited) {
+      docx.edited = true;
+      $('docxMeta').textContent = 'Diqqat: matn maydonidagi oʻzgarishlar Word faylga taʼsir qilmaydi — hujjat asl holidan oʻgiriladi.';
+    }
     clearTimeout(convTimer);
     convTimer = setTimeout(runConvert, convIn.value.length > 20000 ? 250 : 30);
     store.set('ya_conv', convIn.value);
@@ -531,15 +570,85 @@
     $('convFrom').value = to;
     $('convTo').value = from;
     S.convFrom = to; S.convTo = from; save();
+    if (docx) closeDocx();
     if (convOut.value) { convIn.value = convOut.value; store.set('ya_conv', convIn.value); }
     runConvert();
   };
   $('convCopy').onclick = function () { copyText(convOut.value); };
   $('convDownload').onclick = function () { downloadText(convOut.value, 'natija-' + $('convTo').value + '.txt'); };
-  $('convClear').onclick = function () { convIn.value = ''; store.set('ya_conv', ''); runConvert(); convIn.focus(); };
+  $('convClear').onclick = function () { closeDocx(); convIn.value = ''; store.set('ya_conv', ''); runConvert(); convIn.focus(); };
+
+  /* --- Word (.docx) hujjatlar --- */
+  var docx = null;
+  function fmtSize(n) {
+    return n < 1024 * 1024 ? Math.max(1, Math.round(n / 1024)) + ' KB' : (n / 1024 / 1024).toFixed(1) + ' MB';
+  }
+  function loadConvFile(f) {
+    readAnyFile(f, function (text, doc) {
+      closeDocx();
+      convIn.value = text;
+      store.set('ya_conv', text);
+      if (doc) {
+        docx = doc;
+        docx.text = text;
+        $('docxName').textContent = doc.name;
+        $('docxMeta').textContent = fmtSize(doc.size) + ' · Shrift, jadval va rasmlar saqlangan holda oʻgiriladi. Yoʻnalishni tanlab, faylni yuklab oling.';
+        $('docxBar').hidden = false;
+        toast('Word hujjat yuklandi');
+      } else {
+        toast('Fayl yuklandi');
+      }
+      runConvert();
+    });
+  }
+  function closeDocx() {
+    docx = null;
+    $('docxBar').hidden = true;
+  }
   $('convFile').onchange = function () {
-    readFile(this, function (t) { convIn.value = t; store.set('ya_conv', t); runConvert(); toast('Fayl yuklandi'); });
+    var f = this.files && this.files[0];
+    this.value = '';
+    loadConvFile(f);
   };
+  $('docxClose').onclick = closeDocx;
+  $('docxDownload').onclick = function () {
+    if (!docx) return;
+    var btn = this;
+    var from = $('convFrom').value;
+    if (from === 'auto') from = C.detect(docx.text || '');
+    var to = $('convTo').value;
+    if (from === to) { toast('Manba va natija yozuvi bir xil', 'info'); return; }
+    var suffix = { lotin: 'lotin', kirill: 'kirill', yangi: 'yangi-alifbo' }[to];
+    var name = docx.name.replace(/\.docx$/i, '') + '_' + suffix + '.docx';
+    btn.disabled = true;
+    var label = btn.querySelector('span');
+    var old = label.textContent;
+    label.textContent = 'Tayyorlanmoqda…';
+    window.UzDocx.convertDocx(docx.buffer, from, to, { variant: S.variant, ascii: S.convAscii })
+      .then(function (blob) {
+        downloadBlob(blob, name);
+        toast('Word fayl tayyor: ' + name);
+      }, function () { toast('Word faylni oʻgirishda xatolik yuz berdi', 'error'); })
+      .then(function () { btn.disabled = false; label.textContent = old; });
+  };
+  // Faylni matn maydoniga sudrab tashlash
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    convIn.addEventListener(ev, function (e) {
+      if (e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], 'Files') >= 0) {
+        e.preventDefault();
+        convIn.classList.add('drop');
+      }
+    });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    convIn.addEventListener(ev, function () { convIn.classList.remove('drop'); });
+  });
+  convIn.addEventListener('drop', function (e) {
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!f) return;
+    e.preventDefault();
+    loadConvFile(f);
+  });
   $('convPaste').onclick = function () {
     if (navigator.clipboard && navigator.clipboard.readText && window.isSecureContext) {
       navigator.clipboard.readText().then(function (t) {
@@ -658,6 +767,7 @@
     });
     kbEditor.releaseAll();
     kbTrainer.releaseAll();
+    try { document.dispatchEvent(new CustomEvent('ya:tabchange', { detail: tab })); } catch (e) {}
     if (tab === 'trainer') {
       if (!trainer.text) trainer.restart();
       renderHistory();

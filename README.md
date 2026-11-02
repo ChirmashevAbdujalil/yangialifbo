@@ -1,14 +1,20 @@
 # Yangi Alifbo — onlayn oʻzbek klaviaturasi
 
-Oddiy **HTML + CSS + JavaScript** bilan yozilgan sayt. Hech qanday kutubxona, build yoki
-server dasturi kerak emas: fayllarni istalgan hostingga (Netlify, GitHub Pages, oddiy Apache/Nginx,
-cPanel hosting) yuklasangiz yoki `index.html` ni kompyuterda shunchaki ochsangiz ham ishlaydi.
+Oddiy **HTML + CSS + JavaScript** bilan yozilgan sayt. Build yoki server dasturi kerak emas:
+fayllarni istalgan hostingga (Netlify, GitHub Pages, oddiy Apache/Nginx, cPanel hosting) yuklasangiz
+yoki `index.html` ni kompyuterda shunchaki ochsangiz ham ishlaydi.
+
+Dasturchi: **Abdujalil Chirmashev** · Dastur homiysi: **Andijon davlat texnika instituti**
 
 ## Imkoniyatlar
 
 ### Konvertor
 - Kirill ⇄ Lotin ⇄ Yangi alifbo, yozuvni avtomatik aniqlash.
 - Toʻgʻri qoidalar: е → ye/e, ц → s/ts, ъ → ʼ, ё/ю/я, `sʼh` (Isʼhoq), katta harfli soʻzlar (ШАХМАТ → SHAXMAT).
+- **Word (.docx) hujjatlarni oʻgirish**: hujjat yuklanadi, oʻgiriladi va yana .docx sifatida
+  yuklab olinadi. Shrift, qalin/kursiv, jadval, rasm, kolontitul va izohlar saqlanadi.
+  Hujjat faqat brauzerda qayta ishlanadi — hech qayerga yuborilmaydi.
+- Faylni (.txt yoki .docx) matn maydoniga sudrab tashlash mumkin.
 - Fayldan yuklash, nusxa olish, saqlash, natijani muharrirga oʻtkazish.
 
 ### Klaviatura (matn muharriri)
@@ -42,6 +48,18 @@ cPanel hosting) yuklasangiz yoki `index.html` ni kompyuterda shunchaki ochsangiz
   tugma ovozi, telefon va planshetga moslashgan koʻrinish.
 - Telefonda tizim klaviaturasini yashirish (faqat ekrandagi klaviatura bilan yozish).
 - Barcha sozlamalar va natijalar brauzerda (`localStorage`) saqlanadi.
+- Telegram, Facebook va X uchun havola koʻrinishi (rasm, nom, tavsif), Google uchun
+  tuzilgan maʼlumotlar (schema.org) va `robots.txt`.
+
+### Reklama va admin panel
+- Saytda ikkita reklama joyi bor: **sahifa tepasi** (menyu ostida) va **sahifa pasti**.
+  Faol reklama boʻlmasa, bu joylar umuman koʻrinmaydi va sahifaga hech qanday taʼsir qilmaydi.
+- Reklama turlari: **rasm (banner)** — kompyuter va telefon uchun alohida rasm bilan,
+  **matnli eʼlon** (sarlavha, matn, tugma) va **HTML kod** (Google AdSense, Yandex RTB va h.k.).
+- Har bir reklama uchun: qaysi boʻlimlarda koʻrinishi, qurilma (kompyuter/telefon),
+  boshlanish va tugash sanasi, foydalanuvchi yopa olishi mumkinligi.
+- Reklama ustida “Reklama” yozuvi turadi, havolalar `rel="sponsored"` bilan ochiladi.
+- Boshqaruv paneli: `sayt-manzili/admin/`
 
 ## Fayllar
 
@@ -54,6 +72,13 @@ js/keyboard.js    — ekrandagi klaviatura komponenti
 js/data.js        — mashq uchun soʻzlar va maqollar
 js/trainer.js     — tez yozish mashqi
 js/app.js         — asosiy ilova
+js/docx.js        — Word (.docx) hujjatlarni oʻgirish
+js/ads.js         — reklama joylari
+js/vendor/        — JSZip kutubxonasi (Word fayllar uchun, MIT litsenziya)
+ads.json          — reklamalar roʻyxati (admin panel yaratadi)
+ads/uploads/      — admin paneldan yuklangan reklama rasmlari
+admin/            — reklama boshqaruv paneli (admin/save.php — PHP boʻlsa)
+og-image.png      — ijtimoiy tarmoqlarda havola ulashilganda chiqadigan rasm
 ```
 
 ## Ishga tushirish
@@ -65,6 +90,37 @@ js/app.js         — asosiy ilova
 ```bash
 python3 -m http.server 8080
 ```
+
+## Admin panelni sozlash
+
+Panel ikki rejimda ishlaydi va qaysi biri ekanini oʻzi aniqlaydi.
+
+**1. PHP qoʻllaydigan hosting (cPanel, oddiy Apache/Nginx + PHP)** — eng qulayi:
+
+1. `admin/config.php` faylini oching va `PAROLNI_OZGARTIRING` oʻrniga kamida 10 belgidan iborat
+   parol yozing.
+2. Saytni yuklang. `ads.json` fayli va `ads/uploads/` papkasi server tomonidan yozilishi mumkin
+   boʻlishi kerak (odatda 644/755 huquqlar yetarli; kerak boʻlsa hostingda 664/775 qiling).
+3. `sayt-manzili/admin/` ni oching, parol bilan kiring, reklamalarni tayyorlang va
+   **“Saytga saqlash”** tugmasini bosing — oʻzgarishlar darhol saytda koʻrinadi.
+
+Xavfsizlik: parol tekshiruvi serverda, 5 ta notoʻgʻri urinishdan soʻng 15 daqiqa bloklanadi,
+sessiya cookie `HttpOnly` + `SameSite=Strict`, saqlashda CSRF tokeni tekshiriladi,
+yuklangan fayllar faqat haqiqiy rasm (PNG, JPG, GIF, WEBP) boʻlishi mumkin.
+
+**2. Statik hosting (Netlify, GitHub Pages)** — PHP yoʻq:
+
+1. `admin/` sahifasini oching (yoki `admin/index.html` ni kompyuterda oching).
+2. Reklamalarni tayyorlang va **“ads.json yuklab olish”** tugmasini bosing.
+3. Yuklab olingan `ads.json` faylini sayt papkasiga (`index.html` yoniga) joylang va saytni yangilang.
+
+Statik hostingda `admin/config.php` faylini yuklamang — u yerda PHP ishlamaydi va kerak emas.
+
+## Havola koʻrinishi (Telegram, Facebook)
+
+`index.html` dagi `og:image` va `twitter:image` qiymatlarini sayt domeni bilan toʻliq
+manzilga almashtirish tavsiya etiladi, masalan: `https://yangialifbo.uz/og-image.png`.
+Baʼzi ijtimoiy tarmoqlar faqat toʻliq manzilni qabul qiladi.
 
 > Eslatma: “Yangi alifbo” — taklif etilgan loyiha boʻyicha. Sozlamalarda ikki variantdan birini
 > tanlash mumkin: **Ş Ç Ğ Ö** yoki **Ş Ç Ǵ Ó**.

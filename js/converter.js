@@ -2,6 +2,9 @@
  * Yangi Alifbo — matn konvertori
  * Kirill <-> Lotin <-> Yangi alifbo (loyiha) o'girish qoidalari.
  * Hech qanday kutubxonasiz, oddiy brauzer JavaScript.
+ *
+ * Ichki funksiyalar "token" ro'yxatini qaytaradi: { s: [manba indeksi], o: [natija bo'lagi] }.
+ * Bu Word hujjatlarida har bir bo'lak (run) formatlashini saqlagan holda o'girish uchun kerak.
  */
 (function (global) {
   'use strict';
@@ -51,7 +54,40 @@
     return out.charAt(0).toUpperCase() + out.slice(1);
   }
 
-  /* Tutuq belgilarini to'g'rilash: o' g' -> oʻ gʻ, boshqalari -> ʼ */
+  /* ---------------- Token yordamchilari ---------------- */
+  function Tokens() { this.s = []; this.o = []; }
+  Tokens.prototype.push = function (src, out) { this.s.push(src); this.o.push(out); };
+  Tokens.prototype.text = function () { return this.o.join(''); };
+
+  /* Natijadagi har bir belgi manbaning qaysi indeksidan kelganini ko'rsatuvchi massiv */
+  function charMap(t) {
+    var map = [];
+    for (var i = 0; i < t.o.length; i++) {
+      for (var k = 0; k < t.o[i].length; k++) map.push(t.s[i]);
+    }
+    return map;
+  }
+
+  /* Ikki bosqichli o'girishni bitta token ro'yxatiga birlashtirish */
+  function compose(t1, t2) {
+    var map = charMap(t1);
+    var r = new Tokens();
+    var last = t1.s.length ? t1.s[t1.s.length - 1] : 0;
+    for (var i = 0; i < t2.o.length; i++) {
+      var idx = t2.s[i] < map.length ? map[t2.s[i]] : last;
+      r.push(idx, t2.o[i]);
+    }
+    return r;
+  }
+
+  /* Belgilarni bittadan almashtiradigan (uzunlik o'zgarmaydigan) funksiyalar uchun */
+  function identity(text) {
+    var t = new Tokens();
+    for (var i = 0; i < text.length; i++) t.push(i, text.charAt(i));
+    return t;
+  }
+
+  /* Tutuq belgilarini to'g'rilash: o' g' -> oʻ gʻ, boshqalari -> ʼ (uzunlik saqlanadi) */
   function normalizeApostrophes(text) {
     var out = '';
     for (var i = 0; i < text.length; i++) {
@@ -83,8 +119,8 @@
     'ғ': 'g' + OKINA, 'ҳ': 'h'
   };
 
-  function cyrToLat(text) {
-    var out = '';
+  function cyrToLatT(text) {
+    var t = new Tokens();
     for (var i = 0; i < text.length; i++) {
       var ch = text.charAt(i);
       var lo = ch.toLowerCase();
@@ -98,12 +134,12 @@
       } else if (Object.prototype.hasOwnProperty.call(C2L, lo)) {
         r = C2L[lo];
       } else {
-        out += ch;
+        t.push(i, ch);
         continue;
       }
-      out += applyCase(ch, r, capsContext(text, i, 1));
+      t.push(i, applyCase(ch, r, capsContext(text, i, 1)));
     }
-    return out;
+    return t;
   }
 
   /* ---------------- Lotin -> Kirill ---------------- */
@@ -113,9 +149,9 @@
     t: 'т', u: 'у', v: 'в', w: 'в', x: 'х', y: 'й', z: 'з'
   };
 
-  function latToCyr(text) {
+  function latToCyrT(text) {
     text = normalizeApostrophes(text);
-    var out = '';
+    var t = new Tokens();
     var i = 0;
     var n = text.length;
     while (i < n) {
@@ -146,20 +182,20 @@
       else if (Object.prototype.hasOwnProperty.call(L2C, lo)) { r = L2C[lo]; }
 
       if (r === null) {
-        out += ch;
+        t.push(i, ch);
       } else {
-        out += applyCase(ch, r, capsContext(text, i, len));
+        t.push(i, applyCase(ch, r, capsContext(text, i, len)));
       }
       i += len;
     }
-    return out;
+    return t;
   }
 
   /* ---------------- Lotin -> Yangi alifbo ---------------- */
-  function latToNew(text, variant) {
+  function latToNewT(text, variant) {
     var V = VARIANTS[variant] || VARIANTS.A;
     text = normalizeApostrophes(text);
-    var out = '';
+    var t = new Tokens();
     var i = 0;
     var n = text.length;
     while (i < n) {
@@ -168,16 +204,16 @@
       var three = text.substr(i, 3).toLowerCase();
       var up = isUpper(ch);
       if (three === 's' + APOS + 'h') {
-        out += ch + text.charAt(i + 2); i += 3; continue; // Isʼhoq -> Ishoq
+        t.push(i, ch); t.push(i + 2, text.charAt(i + 2)); i += 3; continue; // Isʼhoq -> Ishoq
       }
-      if (two === 'sh') { out += up ? NEW_SH.S : NEW_SH.s; i += 2; continue; }
-      if (two === 'ch') { out += up ? NEW_CH.C : NEW_CH.c; i += 2; continue; }
-      if (two === 'o' + OKINA) { out += up ? V.O : V.o; i += 2; continue; }
-      if (two === 'g' + OKINA) { out += up ? V.G : V.g; i += 2; continue; }
-      out += ch;
+      if (two === 'sh') { t.push(i, up ? NEW_SH.S : NEW_SH.s); i += 2; continue; }
+      if (two === 'ch') { t.push(i, up ? NEW_CH.C : NEW_CH.c); i += 2; continue; }
+      if (two === 'o' + OKINA) { t.push(i, up ? V.O : V.o); i += 2; continue; }
+      if (two === 'g' + OKINA) { t.push(i, up ? V.G : V.g); i += 2; continue; }
+      t.push(i, ch);
       i++;
     }
-    return out;
+    return t;
   }
 
   /* ---------------- Yangi alifbo -> Lotin ---------------- */
@@ -189,24 +225,45 @@
     NEW2L[VARIANTS[k].g] = 'g' + OKINA; NEW2L[VARIANTS[k].G] = 'g' + OKINA;
   });
 
-  function newToLat(text) {
-    var out = '';
+  function newToLatT(text) {
+    var t = new Tokens();
     for (var i = 0; i < text.length; i++) {
       var ch = text.charAt(i);
       if (Object.prototype.hasOwnProperty.call(NEW2L, ch)) {
-        out += applyCase(ch, NEW2L[ch], capsContext(text, i, 1));
+        t.push(i, applyCase(ch, NEW2L[ch], capsContext(text, i, 1)));
       } else if ((ch === 's' || ch === 'S') && (text.charAt(i + 1) === 'h' || text.charAt(i + 1) === 'H')) {
         // yangi alifboda "sh" = s + h (ikki alohida tovush)
-        out += ch + APOS;
+        t.push(i, ch + APOS);
       } else {
-        out += ch;
+        t.push(i, ch);
       }
     }
-    return out;
+    return t;
   }
 
   function toAscii(text) {
     return text.replace(/[ʻʼ]/g, "'");
+  }
+
+  /**
+   * convertMapped(text, from, to, opts) -> { s: [...], o: [...] }
+   * Har bir natija bo'lagi (o[i]) manbadagi qaysi belgidan (s[i]) boshlanganini bildiradi.
+   */
+  function convertMapped(text, from, to, opts) {
+    opts = opts || {};
+    var t1;
+    if (from === 'kirill') t1 = cyrToLatT(text);
+    else if (from === 'yangi') t1 = newToLatT(text);
+    else t1 = identity(normalizeApostrophes(text));
+
+    var lat = t1.text();
+    var res;
+    if (to === 'kirill') res = compose(t1, latToCyrT(lat));
+    else if (to === 'yangi') res = compose(t1, latToNewT(lat, opts.variant));
+    else res = t1;
+
+    if (opts.ascii && to !== 'kirill') res.o = res.o.map(toAscii);
+    return res;
   }
 
   /**
@@ -215,20 +272,8 @@
    * opts.variant: 'A' | 'B'   opts.ascii: true -> ʻ ʼ o'rniga '
    */
   function convert(text, from, to, opts) {
-    opts = opts || {};
     if (!text) return '';
-    var lat;
-    if (from === 'kirill') lat = cyrToLat(text);
-    else if (from === 'yangi') lat = newToLat(text);
-    else lat = normalizeApostrophes(text);
-
-    var res;
-    if (to === 'kirill') res = latToCyr(lat);
-    else if (to === 'yangi') res = latToNew(lat, opts.variant);
-    else res = lat;
-
-    if (opts.ascii && to !== 'kirill') res = toAscii(res);
-    return res;
+    return convertMapped(text, from, to, opts).o.join('');
   }
 
   /* Matn qaysi yozuvda ekanini taxmin qilish */
@@ -249,12 +294,13 @@
     isLetter: isLetter,
     isUpper: isUpper,
     normalizeApostrophes: normalizeApostrophes,
-    cyrToLat: cyrToLat,
-    latToCyr: latToCyr,
-    latToNew: latToNew,
-    newToLat: newToLat,
+    cyrToLat: function (s) { return cyrToLatT(s).text(); },
+    latToCyr: function (s) { return latToCyrT(s).text(); },
+    latToNew: function (s, v) { return latToNewT(s, v).text(); },
+    newToLat: function (s) { return newToLatT(s).text(); },
     toAscii: toAscii,
     convert: convert,
+    convertMapped: convertMapped,
     detect: detect
   };
 })(window);
