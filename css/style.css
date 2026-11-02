@@ -168,6 +168,13 @@ kbd {
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
 .brand-text b { font-size: 1.05rem; letter-spacing: .12em; font-weight: 700; }
 .brand-text small { color: var(--masthead-muted); font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Dasturchi */
+.author {
+  display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2;
+  padding-right: 16px; border-right: 1px solid rgba(255, 255, 255, .25); white-space: nowrap;
+}
+.author small { color: var(--masthead-muted); font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.author b { font-size: .92rem; font-weight: 600; }
 .util { display: flex; gap: 4px; }
 .masthead .icon-btn {
   background: transparent; border-color: transparent; color: var(--masthead-text);
@@ -596,7 +603,13 @@ main { flex: 1; padding-top: 24px; padding-bottom: 40px; }
   .tool-sep { display: none; }
 }
 @media (max-width: 520px) {
-  .masthead-inner { min-height: 56px; gap: 8px; }
+  .masthead-inner { min-height: 56px; gap: 8px; flex-wrap: wrap; row-gap: 0; }
+  .author {
+    order: 3; width: 100%; flex-direction: row; align-items: baseline; gap: 8px;
+    padding: 6px 0 8px; border-right: 0; border-top: 1px solid rgba(255, 255, 255, .15);
+  }
+  .author small { font-size: .66rem; }
+  .author b { font-size: .86rem; }
   .emblem { width: 34px; height: 34px; }
   .emblem .i { width: 20px; height: 20px; }
   .brand-text b { font-size: .92rem; letter-spacing: .08em; }
