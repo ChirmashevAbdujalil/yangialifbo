@@ -21,6 +21,7 @@
   --err: #b42318;
   --err-bg: #fbe4e1;
   --masthead: #0b3a6e;
+  --sponsor-bg: #072a50;
   --masthead-text: #ffffff;
   --masthead-muted: #b8c7da;
   --board: #e3e8ee;
@@ -58,6 +59,7 @@
   --err: #f08b80;
   --err-bg: #3a1d1b;
   --masthead: #0a111b;
+  --sponsor-bg: #060b12;
   --masthead-text: #e8eef6;
   --masthead-muted: #8193aa;
   --board: #101822;
@@ -94,6 +96,7 @@
     --err: #f08b80;
     --err-bg: #3a1d1b;
     --masthead: #0a111b;
+    --sponsor-bg: #060b12;
     --masthead-text: #e8eef6;
     --masthead-muted: #8193aa;
     --board: #101822;
@@ -153,6 +156,12 @@ kbd {
 .muted { color: var(--muted); }
 .center { text-align: center; }
 .container { width: 100%; max-width: 1180px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+
+/* ---------- Homiy chizig'i ---------- */
+.sponsor-bar { background: var(--sponsor-bg); color: var(--masthead-muted); font-size: .8rem; }
+.sponsor-inner { display: flex; align-items: center; gap: 8px; min-height: 32px; flex-wrap: wrap; }
+.sponsor-inner .i { width: 15px; height: 15px; color: var(--masthead-text); }
+.sponsor-inner b { color: var(--masthead-text); font-weight: 600; }
 
 /* ---------- Sarlavha (masthead) ---------- */
 .masthead { background: var(--masthead); color: var(--masthead-text); }
@@ -628,6 +637,18 @@ main { flex: 1; padding-top: 24px; padding-bottom: 40px; }
   .key[data-code="ArrowLeft"], .key[data-code="ArrowRight"] { display: none; }
   .field { flex: 1 1 140px; }
   .field select { min-width: 0; width: 100%; }
+}
+
+@media (max-width: 360px) {
+  .sponsor-inner { gap: 5px; font-size: .7rem; }
+  .sponsor-inner .i { width: 13px; height: 13px; }
+  .masthead-inner { gap: 6px; }
+  .brand { gap: 8px; }
+  .emblem { width: 30px; height: 30px; }
+  .emblem .i { width: 18px; height: 18px; }
+  .brand-text b { font-size: .8rem; letter-spacing: .04em; }
+  .util { gap: 0; }
+  .masthead .icon-btn { width: 32px; height: 32px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
