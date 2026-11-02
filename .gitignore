@@ -1,0 +1,4 @@
+admin/data/ads-stats.php
+ads/uploads/*
+!ads/uploads/index.html
+!ads/uploads/.htaccess

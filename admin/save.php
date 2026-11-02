@@ -7,10 +7,13 @@
  *   POST save.php?action=logout  — chiqish
  *   POST save.php?action=save    — ads.json ni saqlash (JSON tanasi, X-CSRF-Token)
  *   POST save.php?action=upload  — reklama rasmini yuklash (image, X-CSRF-Token)
+ *   GET  save.php?action=stats   — reklama statistikasi (ko'rishlar, bosishlar)
+ *   POST save.php?action=stats_reset — statistikani tozalash (id — bitta reklama, bo'sh — hammasi)
  */
 declare(strict_types=1);
 
 require __DIR__ . '/config.php';
+require __DIR__ . '/lib.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
@@ -71,6 +74,11 @@ function require_auth(): void
     $_SESSION['t'] = time();
 }
 
+function require_login(): void
+{
+    if (!logged_in()) out(['ok' => false, 'error' => 'auth'], 401);
+}
+
 /* Noto'g'ri parol urinishlarini IP bo'yicha cheklash */
 function throttle_file(): string
 {
@@ -128,7 +136,8 @@ function clean_ads(array $data): array
         ];
         if (count($ads) >= 100) break;
     }
-    return ['version' => 1, 'updated' => date('c'), 'ads' => $ads];
+    // tracking: true — saytdagi reklamalar ko'rishlar va bosishlarni ads/track.php ga yuboradi
+    return ['version' => 1, 'updated' => date('c'), 'tracking' => true, 'ads' => $ads];
 }
 
 $action = (string)($_GET['action'] ?? 'ping');
@@ -174,12 +183,14 @@ switch ($action) {
         if ($raw === false || strlen($raw) > MAX_JSON) out(['ok' => false, 'error' => 'too_large'], 413);
         $data = json_decode($raw, true);
         if (!is_array($data) || !isset($data['ads']) || !is_array($data['ads'])) out(['ok' => false, 'error' => 'invalid'], 400);
-        $json = json_encode(clean_ads($data), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "\n";
+        $clean = clean_ads($data);
+        $json = json_encode($clean, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "\n";
         $tmp = ADS_FILE . '.' . bin2hex(random_bytes(4)) . '.tmp';
         if (@file_put_contents($tmp, $json, LOCK_EX) === false || !@rename($tmp, ADS_FILE)) {
             @unlink($tmp);
             out(['ok' => false, 'error' => 'write'], 500);
         }
+        ya_stats_names($clean['ads']);
         out(['ok' => true]);
 
     case 'upload':
@@ -195,6 +206,27 @@ switch ($action) {
         if (!@move_uploaded_file($f['tmp_name'], UPLOAD_DIR . '/' . $name)) out(['ok' => false, 'error' => 'write'], 500);
         @chmod(UPLOAD_DIR . '/' . $name, 0644);
         out(['ok' => true, 'url' => UPLOAD_URL . $name]);
+
+    case 'stats':
+        require_login();
+        $st = ya_stats_read();
+        out([
+            'ok'       => true,
+            'today'    => date('Y-m-d'),
+            'ads'      => (object)$st['ads'],
+            'names'    => (object)$st['names'],
+            'writable' => is_dir(YA_DATA_DIR) ? is_writable(YA_DATA_DIR) : is_writable(__DIR__),
+        ]);
+
+    case 'stats_reset':
+        require_auth();
+        $id = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)($_POST['id'] ?? ''));
+        $ok = ya_stats_update(static function (array $d) use ($id): array {
+            if ($id === '') $d['ads'] = [];
+            else unset($d['ads'][$id]);
+            return $d;
+        });
+        out(['ok' => $ok], $ok ? 200 : 500);
 
     default:
         out(['ok' => false, 'error' => 'unknown_action'], 404);

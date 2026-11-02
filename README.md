@@ -61,6 +61,19 @@ Dasturchi: **Abdujalil Chirmashev** · Dastur homiysi: **Andijon davlat texnika 
 - Reklama ustida “Reklama” yozuvi turadi, havolalar `rel="sponsored"` bilan ochiladi.
 - Boshqaruv paneli: `sayt-manzili/admin/`
 
+### Reklama statistikasi (PHP hostingda)
+- Har bir reklama uchun **koʻrishlar**, **bosishlar** va **CTR** (bosish ulushi) kunlar boʻyicha.
+- Admin paneldagi “Statistika” boʻlimi: davr (7 / 30 / 90 kun, 12 oy), reklama boʻyicha filtr,
+  koʻrsatkich kartochkalari, kunlik (12 oyda — oylik) grafik, jadval koʻrinishi,
+  reklamalar reytingi, Excel uchun CSV yuklab olish, statistikani tozalash.
+- **Koʻrish** — reklamaning kamida yarmi ekranda 1 soniya turganda (bir sahifa ochilishida bir marta).
+  **Bosish** — reklama havolasi bosilganda.
+- Qidiruv robotlari hisoblanmaydi; bir IP manzildan daqiqasiga 60 tadan ortiq hodisa qabul qilinmaydi;
+  faqat mavjud va faol reklamalar hisoblanadi.
+- Maʼlumotlar bazasi (MySQL) kerak emas: kunlik sonlar `admin/data/ads-stats.php` faylida saqlanadi
+  (brauzer orqali ochib boʻlmaydi). IP manzil yoki cookie saqlanmaydi.
+- HTML kod (AdSense, Yandex) reklamalarida bosishlar reklama tarmogʻining oʻz kabinetida hisoblanadi.
+
 ## Fayllar
 
 ```
@@ -77,7 +90,11 @@ js/ads.js         — reklama joylari
 js/vendor/        — JSZip kutubxonasi (Word fayllar uchun, MIT litsenziya)
 ads.json          — reklamalar roʻyxati (admin panel yaratadi)
 ads/uploads/      — admin paneldan yuklangan reklama rasmlari
+ads/track.php     — koʻrish va bosishlarni hisoblash (PHP)
 admin/            — reklama boshqaruv paneli (admin/save.php — PHP boʻlsa)
+admin/stats.js    — statistika boʻlimi
+admin/lib.php     — statistika ombori (PHP)
+admin/data/       — statistika fayli (server yozishi mumkin boʻlishi kerak)
 og-image.png      — ijtimoiy tarmoqlarda havola ulashilganda chiqadigan rasm
 ```
 
@@ -99,8 +116,8 @@ Panel ikki rejimda ishlaydi va qaysi biri ekanini oʻzi aniqlaydi.
 
 1. `admin/config.php` faylini oching va `PAROLNI_OZGARTIRING` oʻrniga kamida 10 belgidan iborat
    parol yozing.
-2. Saytni yuklang. `ads.json` fayli va `ads/uploads/` papkasi server tomonidan yozilishi mumkin
-   boʻlishi kerak (odatda 644/755 huquqlar yetarli; kerak boʻlsa hostingda 664/775 qiling).
+2. Saytni yuklang. `ads.json` fayli, `ads/uploads/` va `admin/data/` papkalari server tomonidan
+   yozilishi mumkin boʻlishi kerak (odatda 644/755 huquqlar yetarli; kerak boʻlsa 664/775 qiling).
 3. `sayt-manzili/admin/` ni oching, parol bilan kiring, reklamalarni tayyorlang va
    **“Saytga saqlash”** tugmasini bosing — oʻzgarishlar darhol saytda koʻrinadi.
 

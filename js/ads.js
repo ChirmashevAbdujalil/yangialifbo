@@ -192,6 +192,54 @@
     var mq = global.matchMedia ? global.matchMedia(MOBILE_MQ) : null;
     var ads = [];
     var chosen = {};
+    var tracking = false;
+    var viewed = {};
+    var lastClick = {};
+
+    /* --- Statistika: ko'rish va bosishlarni serverga yuborish (faqat PHP hostingda) --- */
+    function send(id, ev) {
+      if (!tracking || navigator.webdriver) return;
+      var fd = new FormData();
+      fd.append('ad', id);
+      fd.append('e', ev);
+      try { if (navigator.sendBeacon && navigator.sendBeacon('ads/track.php', fd)) return; } catch (e) {}
+      try { fetch('ads/track.php', { method: 'POST', body: fd, keepalive: true }).catch(function () {}); } catch (e) {}
+    }
+    /* Ko'rish: reklamaning kamida yarmi 1 soniya ekranda tursa (sahifa ochilishida bir marta) */
+    function watch(slot, ad) {
+      if (!tracking || viewed[ad.id]) return;
+      if (!('IntersectionObserver' in global)) { viewed[ad.id] = true; send(ad.id, 'v'); return; }
+      var timer = null;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && en.intersectionRatio >= 0.5 && !document.hidden) {
+            if (!timer) {
+              timer = setTimeout(function () {
+                if (viewed[ad.id]) return;
+                viewed[ad.id] = true;
+                send(ad.id, 'v');
+                io.disconnect();
+              }, 1000);
+            }
+          } else {
+            clearTimeout(timer);
+            timer = null;
+          }
+        });
+      }, { threshold: [0, 0.5, 1] });
+      io.observe(slot);
+      slot._io = io;
+    }
+    /* Bosish: reklama ichidagi havola bosilganda */
+    function clickTracker(ad) {
+      return function (e) {
+        if (!e.target.closest || !e.target.closest('a[href]')) return;
+        var now = Date.now();
+        if (now - (lastClick[ad.id] || 0) < 1500) return;
+        lastClick[ad.id] = now;
+        send(ad.id, 'c');
+      };
+    }
 
     function closed(id) {
       try { return sessionStorage.getItem('ya_ad_closed_' + id) === '1'; } catch (e) { return false; }
@@ -217,15 +265,19 @@
         var id = ad ? ad.id : null;
         if (slot._adId === id) return;
         slot._adId = id;
+        if (slot._io) { slot._io.disconnect(); slot._io = null; }
         slot.hidden = true;
         slot.innerHTML = '';
         if (!ad) return;
         var r = render(ad, { onClose: close });
+        r.el.addEventListener('click', clickTracker(ad), true);
+        r.el.addEventListener('auxclick', clickTracker(ad), true);
         slot.appendChild(r.el);
         r.ready.then(function () {
           if (slot._adId !== id) return;
           slot.hidden = false;
           r.mount();
+          watch(slot, ad);
         }, function () {
           if (slot._adId === id) slot.innerHTML = '';
         });
@@ -236,6 +288,7 @@
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         var day = today();
+        tracking = !!(data && data.tracking === true);
         ads = (data && Array.isArray(data.ads) ? data.ads : []).filter(function (a) {
           return status(a, day) === 'active' && SLOTS[a.slot];
         });

@@ -1,5 +1,5 @@
 # Sozlamalar fayliga brauzer orqali kirishni taqiqlash (Apache)
-<Files "config.php">
+<FilesMatch "^(config|lib)\.php$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
@@ -7,5 +7,5 @@
     Order allow,deny
     Deny from all
   </IfModule>
-</Files>
+</FilesMatch>
 Options -Indexes

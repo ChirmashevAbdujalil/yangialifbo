@@ -143,7 +143,9 @@
       b.innerHTML = '<span class="ad-item-icon"><svg class="i"><use href="#i-' + TYPE_ICON[ad.type] + '"/></svg></span>' +
         '<span class="ad-item-body"><b></b><small></small></span><span class="status"></span>';
       b.querySelector('b').textContent = ad.name || 'Nomsiz reklama';
-      b.querySelector('small').textContent = (ad.slot === 'top' ? 'Tepada' : 'Pastda') + ' · ' + pagesText(ad);
+      var sum = window.YaStats && window.YaStats.summary(ad.id);
+      b.querySelector('small').textContent = (ad.slot === 'top' ? 'Tepada' : 'Pastda') + ' · ' + pagesText(ad) +
+        (sum ? ' · 30 kun: ' + sum.v + ' koʻrish, ' + sum.c + ' bosish' : '');
       var s = b.querySelector('.status');
       s.textContent = st[0];
       s.classList.add('st-' + st[1]);
@@ -439,7 +441,36 @@
     box.hidden = false;
   }
 
+  /* Bo'limlar: Reklamalar | Statistika */
+  var view = 'ads';
+  function setView(v) {
+    view = v;
+    document.querySelectorAll('#viewTabs .vtab').forEach(function (b) {
+      var on = b.dataset.view === v;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    $('workspace').hidden = v !== 'ads';
+    $('saveBar').hidden = v !== 'ads';
+    $('statsView').hidden = v !== 'stats';
+    if (v === 'stats' && window.YaStats) window.YaStats.show();
+  }
+  document.querySelectorAll('#viewTabs .vtab').forEach(function (b) {
+    b.onclick = function () { setView(b.dataset.view); };
+  });
+
+  window.YaAdmin = {
+    api: api,
+    mode: function () { return mode; },
+    ads: function () { return data.ads; },
+    status: function (ad) { return STATUS[A.status(ad)]; },
+    toast: toast,
+    refreshList: renderList
+  };
+
   function showLogin() {
+    $('viewTabs').hidden = true;
+    $('statsView').hidden = true;
     $('workspace').hidden = true;
     $('saveBar').hidden = true;
     $('logoutBtn').hidden = true;
@@ -450,8 +481,8 @@
 
   function startWorkspace() {
     $('loginCard').hidden = true;
-    $('workspace').hidden = false;
-    $('saveBar').hidden = false;
+    $('viewTabs').hidden = false;
+    setView('ads');
     $('saveBtn').hidden = mode !== 'server';
     $('logoutBtn').hidden = mode !== 'server';
     fetch('../ads.json', { cache: 'no-store' })
@@ -467,6 +498,8 @@
           store(DRAFT_KEY, null);
         }
         updateSaveState();
+        // Ro'yxatda 30 kunlik ko'rsatkichlarni ko'rsatish uchun statistikani fon rejimida yuklash
+        if (mode === 'server' && window.YaStats) window.YaStats.load().then(renderList, function () {});
       });
   }
 
