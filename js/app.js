@@ -28,7 +28,7 @@
     layout: 'lotin', variant: 'A', sound: true, theme: '', auto: true, smart: true,
     map: true, fingers: true, noSysKb: isTouch, errSound: true, fontSize: 20,
     lesson: 'home', duration: 60, backspace: true, stop: false, heat: false,
-    targetHint: true, tab: 'editor', convFrom: 'auto', convTo: 'lotin', convAscii: false
+    targetHint: true, tab: 'converter', convFrom: 'auto', convTo: 'lotin', convAscii: false
   };
   var S = Object.assign({}, DEFAULTS, store.get('ya_settings', {}));
   function save() { store.set('ya_settings', S); }
@@ -776,6 +776,7 @@
   renderAlphabet();
   runConvert();
   renderHistory();
-  switchTab(S.tab);
-  if (S.tab === 'editor' && !isTouch) editor.focus();
+  // Sayt har doim birinchi boʻlim — Konvertor bilan ochiladi
+  switchTab('converter');
+  if (!isTouch) convIn.focus();
 })();

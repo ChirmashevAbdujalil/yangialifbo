@@ -77,9 +77,9 @@
   <nav class="navbar" aria-label="Boʻlimlar">
     <div class="container navbar-inner">
       <div class="tabs" role="tablist">
-        <button class="tab active" role="tab" data-tab="editor" aria-selected="true"><svg class="i"><use href="#i-keyboard"/></svg><span>Klaviatura</span></button>
+        <button class="tab active" role="tab" data-tab="converter" aria-selected="true"><svg class="i"><use href="#i-convert"/></svg><span>Konvertor</span></button>
+        <button class="tab" role="tab" data-tab="editor" aria-selected="false"><svg class="i"><use href="#i-keyboard"/></svg><span>Klaviatura</span></button>
         <button class="tab" role="tab" data-tab="trainer" aria-selected="false"><svg class="i"><use href="#i-gauge"/></svg><span>Mashq</span></button>
-        <button class="tab" role="tab" data-tab="converter" aria-selected="false"><svg class="i"><use href="#i-convert"/></svg><span>Konvertor</span></button>
         <button class="tab" role="tab" data-tab="alphabet" aria-selected="false"><svg class="i"><use href="#i-book"/></svg><span>Alifbo</span></button>
       </div>
       <div class="layout-switch">
@@ -94,8 +94,64 @@
   </nav>
 
   <main class="container">
+    <!-- ============ KONVERTOR ============ -->
+    <section class="panel active" id="tab-converter" role="tabpanel">
+      <div class="page-head">
+        <h1>Yozuv konvertori</h1>
+        <p>Matnni kirill, lotin va yangi alifbo oʻrtasida amaldagi imlo qoidalari asosida oʻgiring.</p>
+      </div>
+
+      <div class="box conv-head">
+        <label class="field">
+          <span>Manba yozuv</span>
+          <select id="convFrom">
+            <option value="auto">Avtomatik aniqlash</option>
+            <option value="kirill">Кирилл</option>
+            <option value="lotin">Lotin</option>
+            <option value="yangi">Yangi alifbo</option>
+          </select>
+        </label>
+        <button class="btn btn-square swap" id="swapBtn" title="Yoʻnalishni almashtirish" aria-label="Yoʻnalishni almashtirish"><svg class="i"><use href="#i-convert"/></svg></button>
+        <label class="field">
+          <span>Natija yozuvi</span>
+          <select id="convTo">
+            <option value="lotin">Lotin</option>
+            <option value="kirill">Кирилл</option>
+            <option value="yangi">Yangi alifbo</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="convAscii"> ʻ ʼ oʻrniga oddiy ' belgisini ishlatish</label>
+      </div>
+
+      <div class="conv-grid">
+        <div class="conv-box">
+          <div class="conv-box-head">
+            <b>Asl matn</b>
+            <span class="badge" id="convDetected" hidden></span>
+            <div class="spacer"></div>
+            <label class="btn small" title="Fayldan yuklash"><svg class="i"><use href="#i-file"/></svg><span>Fayl</span><input type="file" id="convFile" accept=".txt,text/plain" hidden></label>
+            <button class="btn small" id="convPaste" title="Bufer xotiradan joylash"><svg class="i"><use href="#i-paste"/></svg><span>Joylash</span></button>
+            <button class="btn small ghost" id="convClear" title="Tozalash" aria-label="Tozalash"><svg class="i"><use href="#i-trash"/></svg></button>
+          </div>
+          <textarea id="convIn" spellcheck="false" placeholder="Oʻgiriladigan matnni kiriting yoki joylang…"></textarea>
+          <div class="conv-foot" id="convInCount">0 belgi</div>
+        </div>
+        <div class="conv-box">
+          <div class="conv-box-head">
+            <b>Natija</b>
+            <div class="spacer"></div>
+            <button class="btn small" id="convCopy" title="Nusxa olish"><svg class="i"><use href="#i-copy"/></svg><span>Nusxa</span></button>
+            <button class="btn small" id="convDownload" title="Yuklab olish"><svg class="i"><use href="#i-download"/></svg><span>Yuklab olish</span></button>
+            <button class="btn small" id="convToEditor" title="Muharrirda ochish"><svg class="i"><use href="#i-pen"/></svg><span>Muharrirga</span></button>
+          </div>
+          <textarea id="convOut" spellcheck="false" readonly placeholder="Natija shu yerda koʻrsatiladi…"></textarea>
+          <div class="conv-foot" id="convOutCount">0 belgi</div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ KLAVIATURA / MATN MUHARRIRI ============ -->
-    <section class="panel active" id="tab-editor" role="tabpanel">
+    <section class="panel" id="tab-editor" role="tabpanel">
       <div class="page-head">
         <h1>Matn muharriri</h1>
         <p>Tanlangan yozuvda matn kiriting. Kompyuteringiz tili qaysi boʻlishidan qatʼi nazar, matn tanlangan alifboda yoziladi.</p>
@@ -218,62 +274,6 @@
       </div>
     </section>
 
-    <!-- ============ KONVERTOR ============ -->
-    <section class="panel" id="tab-converter" role="tabpanel">
-      <div class="page-head">
-        <h1>Yozuv konvertori</h1>
-        <p>Matnni kirill, lotin va yangi alifbo oʻrtasida amaldagi imlo qoidalari asosida oʻgiring.</p>
-      </div>
-
-      <div class="box conv-head">
-        <label class="field">
-          <span>Manba yozuv</span>
-          <select id="convFrom">
-            <option value="auto">Avtomatik aniqlash</option>
-            <option value="kirill">Кирилл</option>
-            <option value="lotin">Lotin</option>
-            <option value="yangi">Yangi alifbo</option>
-          </select>
-        </label>
-        <button class="btn btn-square swap" id="swapBtn" title="Yoʻnalishni almashtirish" aria-label="Yoʻnalishni almashtirish"><svg class="i"><use href="#i-convert"/></svg></button>
-        <label class="field">
-          <span>Natija yozuvi</span>
-          <select id="convTo">
-            <option value="lotin">Lotin</option>
-            <option value="kirill">Кирилл</option>
-            <option value="yangi">Yangi alifbo</option>
-          </select>
-        </label>
-        <label class="check"><input type="checkbox" id="convAscii"> ʻ ʼ oʻrniga oddiy ' belgisini ishlatish</label>
-      </div>
-
-      <div class="conv-grid">
-        <div class="conv-box">
-          <div class="conv-box-head">
-            <b>Asl matn</b>
-            <span class="badge" id="convDetected" hidden></span>
-            <div class="spacer"></div>
-            <label class="btn small" title="Fayldan yuklash"><svg class="i"><use href="#i-file"/></svg><span>Fayl</span><input type="file" id="convFile" accept=".txt,text/plain" hidden></label>
-            <button class="btn small" id="convPaste" title="Bufer xotiradan joylash"><svg class="i"><use href="#i-paste"/></svg><span>Joylash</span></button>
-            <button class="btn small ghost" id="convClear" title="Tozalash" aria-label="Tozalash"><svg class="i"><use href="#i-trash"/></svg></button>
-          </div>
-          <textarea id="convIn" spellcheck="false" placeholder="Oʻgiriladigan matnni kiriting yoki joylang…"></textarea>
-          <div class="conv-foot" id="convInCount">0 belgi</div>
-        </div>
-        <div class="conv-box">
-          <div class="conv-box-head">
-            <b>Natija</b>
-            <div class="spacer"></div>
-            <button class="btn small" id="convCopy" title="Nusxa olish"><svg class="i"><use href="#i-copy"/></svg><span>Nusxa</span></button>
-            <button class="btn small" id="convDownload" title="Yuklab olish"><svg class="i"><use href="#i-download"/></svg><span>Yuklab olish</span></button>
-            <button class="btn small" id="convToEditor" title="Muharrirda ochish"><svg class="i"><use href="#i-pen"/></svg><span>Muharrirga</span></button>
-          </div>
-          <textarea id="convOut" spellcheck="false" readonly placeholder="Natija shu yerda koʻrsatiladi…"></textarea>
-          <div class="conv-foot" id="convOutCount">0 belgi</div>
-        </div>
-      </div>
-    </section>
-
     <!-- ============ ALIFBO ============ -->
     <section class="panel" id="tab-alphabet" role="tabpanel">
       <div class="page-head">
@@ -346,9 +346,9 @@
       <div class="modal-body help">
         <h4>Boʻlimlar</h4>
         <ul>
+          <li><b>Konvertor</b> — matnni Kirill, Lotin va Yangi alifbo oʻrtasida oʻgirish, fayldan yuklash va saqlash.</li>
           <li><b>Klaviatura</b> — Lotin, Кирилл yoki Yangi alifboda matn kiritish. Kompyuter tili inglizcha yoki ruscha boʻlsa ham, matn tanlangan yozuvda yoziladi.</li>
           <li><b>Mashq</b> — tez yozishni oʻrganish: darslar, vaqt, soʻz/daqiqa, aniqlik, xatolar xaritasi va natijalar tarixi.</li>
-          <li><b>Konvertor</b> — matnni Kirill, Lotin va Yangi alifbo oʻrtasida oʻgirish, fayldan yuklash va saqlash.</li>
           <li><b>Alifbo</b> — harflar jadvali va misollar.</li>
         </ul>
         <h4>Tezkor tugmalar</h4>

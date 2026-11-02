@@ -6,6 +6,11 @@ cPanel hosting) yuklasangiz yoki `index.html` ni kompyuterda shunchaki ochsangiz
 
 ## Imkoniyatlar
 
+### Konvertor
+- Kirill ⇄ Lotin ⇄ Yangi alifbo, yozuvni avtomatik aniqlash.
+- Toʻgʻri qoidalar: е → ye/e, ц → s/ts, ъ → ʼ, ё/ю/я, `sʼh` (Isʼhoq), katta harfli soʻzlar (ШАХМАТ → SHAXMAT).
+- Fayldan yuklash, nusxa olish, saqlash, natijani muharrirga oʻtkazish.
+
 ### Klaviatura (matn muharriri)
 - Uchta yozuv: **Lotin**, **Кирилл** va **Yangi alifbo** (loyiha).
 - Kompyuteringiz tili inglizcha yoki ruscha boʻlsa ham, matn tanlangan yozuvda yoziladi
@@ -28,11 +33,6 @@ cPanel hosting) yuklasangiz yoki `index.html` ni kompyuterda shunchaki ochsangiz
 - **Xatolar xaritasi** — qaysi tugmalarda koʻp adashayotganingiz klaviaturada koʻrinadi.
 - Natijalar tarixi, grafik, eng yaxshi natija va daraja (Boshlangʻich → Usta).
 - Barcha darslar uchala yozuvda ishlaydi.
-
-### Konvertor
-- Kirill ⇄ Lotin ⇄ Yangi alifbo, yozuvni avtomatik aniqlash.
-- Toʻgʻri qoidalar: е → ye/e, ц → s/ts, ъ → ʼ, ё/ю/я, `sʼh` (Isʼhoq), katta harfli soʻzlar (ШАХМАТ → SHAXMAT).
-- Fayldan yuklash, nusxa olish, saqlash, natijani muharrirga oʻtkazish.
 
 ### Alifbo
 - Har bir harf uch yozuvda va misol soʻz bilan; bossangiz muharrirga qoʻshiladi.
