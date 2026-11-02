@@ -6,7 +6,7 @@ cPanel hosting) yuklasangiz yoki `index.html` ni kompyuterda shunchaki ochsangiz
 
 ## Imkoniyatlar
 
-### ⌨️ Klaviatura (matn muharriri)
+### Klaviatura (matn muharriri)
 - Uchta yozuv: **Lotin**, **Кирилл** va **Yangi alifbo** (loyiha).
 - Kompyuteringiz tili inglizcha yoki ruscha boʻlsa ham, matn tanlangan yozuvda yoziladi
   (tugmalar fizik joylashuvi boʻyicha aniqlanadi).
@@ -19,26 +19,27 @@ cPanel hosting) yuklasangiz yoki `index.html` ni kompyuterda shunchaki ochsangiz
 - Nusxa olish, `.txt` qilib saqlash, fayl ochish, tutuq belgilarini tuzatish,
   shrift oʻlchami, belgi/soʻz/qator hisoblagichi, matn avtomatik saqlanadi.
 
-### 🏁 Mashq (tez yozish trenajyori)
+### Mashq (tez yozish trenajyori)
 - 10 ta dars: asosiy qator, yuqori/pastki qator, barcha harflar, maxsus harflar, soʻzlar,
   bosh harflar, raqamlar, maqollar va oʻz matningiz.
 - Vaqt: 15 s, 30 s, 1, 2, 5 daqiqa yoki “matn tugaguncha”.
 - Jonli statistika: soʻz/daqiqa, belgi/daqiqa, aniqlik, xatolar, progress.
 - Keyingi bosiladigan tugma va kerakli Shift yoritiladi, barmoqlar boʻyicha ranglar.
 - **Xatolar xaritasi** — qaysi tugmalarda koʻp adashayotganingiz klaviaturada koʻrinadi.
-- Natijalar tarixi, grafik, eng yaxshi natija va daraja (Boshlovchi → Chempion).
+- Natijalar tarixi, grafik, eng yaxshi natija va daraja (Boshlangʻich → Usta).
 - Barcha darslar uchala yozuvda ishlaydi.
 
-### 🔄 Konvertor
+### Konvertor
 - Kirill ⇄ Lotin ⇄ Yangi alifbo, yozuvni avtomatik aniqlash.
 - Toʻgʻri qoidalar: е → ye/e, ц → s/ts, ъ → ʼ, ё/ю/я, `sʼh` (Isʼhoq), katta harfli soʻzlar (ШАХМАТ → SHAXMAT).
 - Fayldan yuklash, nusxa olish, saqlash, natijani muharrirga oʻtkazish.
 
-### 🔤 Alifbo
+### Alifbo
 - Har bir harf uch yozuvda va misol soʻz bilan; bossangiz muharrirga qoʻshiladi.
 
 ### Umumiy
-- Kunduzgi / tungi mavzu, tugma ovozi, telefon va planshetga moslashgan dizayn.
+- Rasmiy uslubdagi dizayn: SVG ikonlar (internetsiz ishlaydi), kunduzgi / tungi mavzu,
+  tugma ovozi, telefon va planshetga moslashgan koʻrinish.
 - Telefonda tizim klaviaturasini yashirish (faqat ekrandagi klaviatura bilan yozish).
 - Barcha sozlamalar va natijalar brauzerda (`localStorage`) saqlanadi.
 

@@ -7,6 +7,17 @@
   'use strict';
 
   var L = global.UzLayouts;
+
+  /* SVG ikon (index.html dagi <symbol> lardan) */
+  function icon(name) {
+    return '<svg class="i" aria-hidden="true"><use href="#i-' + name + '"/></svg>';
+  }
+  global.uzIcon = icon;
+
+  var ACTION_ICONS = {
+    Backspace: 'backspace', Tab: 'tab', Enter: 'enter', ShiftLeft: 'shift', ShiftRight: 'shift',
+    CapsLock: 'caps', ArrowLeft: 'left', ArrowRight: 'right', Lang: 'globe'
+  };
   var ACTIONS = {
     Backspace: 1, Tab: 1, Enter: 1, ArrowLeft: 1, ArrowRight: 1, Lang: 1,
     ShiftLeft: 1, ShiftRight: 1, CapsLock: 1, AltLeft: 1, AltRight: 1
@@ -123,8 +134,10 @@
       if (ACTIONS[code] || code === 'Space') {
         var lbl = L.ACTION_LABELS[code];
         if (code === 'Space') lbl = L.NAMES[self.layout];
-        if (code === 'Lang') lbl = '🌐 ' + (self.layout === 'kirill' ? 'Ки' : self.layout === 'yangi' ? 'Ya' : 'Lo');
-        main.textContent = lbl;
+        if (code === 'Lang') lbl = self.layout === 'kirill' ? 'КИР' : self.layout === 'yangi' ? 'YAN' : 'LOT';
+        var ic = ACTION_ICONS[code];
+        var html = (ic ? icon(ic) : '') + (lbl ? '<span class="k-lbl">' + lbl + '</span>' : '');
+        if (main.innerHTML !== html) main.innerHTML = html;
         sub.textContent = '';
         return;
       }

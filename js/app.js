@@ -59,9 +59,11 @@
 
   /* ---------------- Toast ---------------- */
   var toastTimer;
-  function toast(msg) {
+  function toast(msg, kind) {
     var t = $('toast');
-    t.textContent = msg;
+    t.className = 'toast' + (kind === 'error' ? ' error' : '');
+    t.innerHTML = window.uzIcon(kind === 'error' ? 'alert' : kind === 'info' ? 'info' : 'check') + '<span></span>';
+    t.lastChild.textContent = msg;
     t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2200);
@@ -69,9 +71,9 @@
 
   /* ---------------- Clipboard / fayl ---------------- */
   function copyText(text) {
-    if (!text) { toast('Matn boʻsh'); return; }
+    if (!text) { toast('Matn boʻsh', 'info'); return; }
     if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(function () { toast('✅ Nusxa olindi'); }, fallback);
+      navigator.clipboard.writeText(text).then(function () { toast('Nusxa olindi'); }, fallback);
     } else fallback();
     function fallback() {
       var ta = document.createElement('textarea');
@@ -80,13 +82,13 @@
       ta.style.position = 'fixed'; ta.style.opacity = '0';
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand('copy'); toast('✅ Nusxa olindi'); } catch (e) { toast('Nusxa olib boʻlmadi'); }
+      try { document.execCommand('copy'); toast('Nusxa olindi'); } catch (e) { toast('Nusxa olib boʻlmadi', 'error'); }
       document.body.removeChild(ta);
     }
   }
 
   function downloadText(text, name) {
-    if (!text) { toast('Matn boʻsh'); return; }
+    if (!text) { toast('Matn boʻsh', 'info'); return; }
     var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -101,7 +103,7 @@
     if (!f) return;
     var r = new FileReader();
     r.onload = function () { cb(String(r.result)); input.value = ''; };
-    r.onerror = function () { toast('Faylni oʻqib boʻlmadi'); };
+    r.onerror = function () { toast('Faylni oʻqib boʻlmadi', 'error'); };
     r.readAsText(f, 'utf-8');
   }
 
@@ -204,17 +206,17 @@
   var saveTimer;
   function updateCounters() {
     var v = editor.value;
-    $('cntChars').textContent = v.length + ' belgi';
-    $('cntWords').textContent = (v.match(/\S+/g) || []).length + ' soʻz';
-    $('cntLines').textContent = v.split('\n').length + ' qator';
+    $('cntChars').textContent = v.length;
+    $('cntWords').textContent = (v.match(/\S+/g) || []).length;
+    $('cntLines').textContent = v.split('\n').length;
   }
   editor.addEventListener('input', function () {
     updateCounters();
-    $('saveState').textContent = 'Saqlanmoqda…';
+    $('saveState').innerHTML = window.uzIcon('rotate') + 'Saqlanmoqda…';
     clearTimeout(saveTimer);
     saveTimer = setTimeout(function () {
       store.set('ya_text', editor.value);
-      $('saveState').textContent = 'Avtomatik saqlandi ✓';
+      $('saveState').innerHTML = window.uzIcon('check') + 'Saqlandi';
     }, 400);
   });
 
@@ -227,13 +229,13 @@
 
   $('copyBtn').onclick = function () { copyText(editor.value); };
   $('downloadBtn').onclick = function () { downloadText(editor.value, 'matn.txt'); };
-  $('openFile').onchange = function () { readFile(this, function (t) { replaceEditorText(t); toast('📂 Fayl ochildi'); }); };
+  $('openFile').onchange = function () { readFile(this, function (t) { replaceEditorText(t); toast('Fayl ochildi'); }); };
   $('fixBtn').onclick = function () {
     var before = editor.value;
     var after = S.layout === 'kirill' ? before : C.normalizeApostrophes(before);
-    if (after === before) { toast('Tuzatiladigan belgi topilmadi'); return; }
+    if (after === before) { toast('Tuzatiladigan belgi topilmadi', 'info'); return; }
     replaceEditorText(after);
-    toast('✨ Tutuq belgilari tuzatildi');
+    toast('Tutuq belgilari tuzatildi');
   };
   $('toConverterBtn').onclick = function () {
     $('convIn').value = editor.value;
@@ -342,8 +344,8 @@
 
   /* --- Natijalar --- */
   var RANKS = [
-    [0, '🐢 Boshlovchi'], [20, '🚶 Havaskor'], [30, '🏃 Oʻrta daraja'],
-    [40, '🚴 Yaxshi'], [55, '🚗 Aʼlo'], [70, '🚀 Usta'], [90, '⚡ Chempion']
+    [0, 'Boshlangʻich'], [20, 'Havaskor'], [30, 'Oʻrta'],
+    [40, 'Yaxshi'], [55, 'Aʼlo'], [70, 'Mohir'], [90, 'Usta']
   ];
   function rankOf(wpm) {
     var r = RANKS[0][1];
@@ -369,13 +371,14 @@
     $('resErr').textContent = m.errors;
     $('resTime').textContent = window.Trainer.fmtTime(m.time);
     var best = Math.max.apply(null, hist.map(function (x) { return x.w; }));
-    $('resRank').textContent = rankOf(m.wpm) + (m.wpm >= best && hist.length > 1 ? ' · 🎉 Yangi rekord!' : '');
+    $('resRank').innerHTML = 'Daraja: <b>' + rankOf(m.wpm) + '</b>' +
+      (m.wpm >= best && hist.length > 1 ? '<span class="badge ok">Yangi rekord</span>' : '');
     var weak = Object.keys(m.errChars).sort(function (a, b) { return m.errChars[b] - m.errChars[a]; }).slice(0, 5);
     $('resWeak').innerHTML = weak.length
-      ? 'Koʻp xato qilingan belgilar: ' + weak.map(function (c) {
+      ? 'Eng koʻp xato qilingan belgilar: ' + weak.map(function (c) {
         return '<kbd>' + (c === ' ' ? '␣' : escapeHtml(c)) + '</kbd>×' + m.errChars[c];
       }).join(' ')
-      : 'Birorta ham xato yoʻq — zoʻr! 👏';
+      : 'Mashq xatolarsiz bajarildi.';
 
     renderHistory();
     applyHeat();
@@ -501,13 +504,17 @@
     var det = '';
     if (from === 'auto') {
       from = C.detect(text);
-      det = text ? 'aniqlandi: ' + L.NAMES[from] : '';
+      det = text ? 'Aniqlandi: ' + L.NAMES[from] : '';
     }
     $('convDetected').textContent = det;
+    $('convDetected').hidden = !det;
     convOut.value = C.convert(text, from, to, { variant: S.variant, ascii: S.convAscii });
     $('convInCount').textContent = text.length + ' belgi';
     $('convOutCount').textContent = convOut.value.length + ' belgi';
-    if (from === to && text) $('convDetected').textContent = det + ' (yozuvlar bir xil — faqat tutuq belgilari tuzatiladi)';
+    if (from === to && text) {
+      $('convDetected').textContent = (det ? det + ' · ' : '') + 'yozuvlar bir xil';
+      $('convDetected').hidden = false;
+    }
   }
   convIn.addEventListener('input', function () {
     clearTimeout(convTimer);
@@ -531,17 +538,17 @@
   $('convDownload').onclick = function () { downloadText(convOut.value, 'natija-' + $('convTo').value + '.txt'); };
   $('convClear').onclick = function () { convIn.value = ''; store.set('ya_conv', ''); runConvert(); convIn.focus(); };
   $('convFile').onchange = function () {
-    readFile(this, function (t) { convIn.value = t; store.set('ya_conv', t); runConvert(); toast('📂 Fayl yuklandi'); });
+    readFile(this, function (t) { convIn.value = t; store.set('ya_conv', t); runConvert(); toast('Fayl yuklandi'); });
   };
   $('convPaste').onclick = function () {
     if (navigator.clipboard && navigator.clipboard.readText && window.isSecureContext) {
       navigator.clipboard.readText().then(function (t) {
         convIn.value = t; store.set('ya_conv', t); runConvert();
-      }, function () { toast('Ruxsat berilmadi — Ctrl+V dan foydalaning'); convIn.focus(); });
-    } else { toast('Ctrl+V bilan joylang'); convIn.focus(); }
+      }, function () { toast('Ruxsat berilmadi — Ctrl+V dan foydalaning', 'error'); convIn.focus(); });
+    } else { toast('Ctrl+V bilan joylang', 'info'); convIn.focus(); }
   };
   $('convToEditor').onclick = function () {
-    if (!convOut.value) { toast('Natija boʻsh'); return; }
+    if (!convOut.value) { toast('Natija boʻsh', 'info'); return; }
     var target = $('convTo').value;
     switchTab('editor');
     if (S.layout !== target) setLayout(target);
@@ -582,7 +589,7 @@
       card.className = 'alpha-card';
       card.innerHTML =
         '<div class="alpha-main">' + escapeHtml(lat) + '</div>' +
-        '<div class="alpha-row"><span title="Kirill">' + escapeHtml(cyr) + '</span><span title="Yangi alifbo">' + escapeHtml(nw) + '</span></div>' +
+        '<div class="alpha-row"><span class="cyr" title="Kirill">' + escapeHtml(cyr) + '</span><span class="new" title="Yangi alifbo">' + escapeHtml(nw) + '</span></div>' +
         '<div class="alpha-word">' + escapeHtml(word) + '<br><small>' + escapeHtml(C.convert(word, 'lotin', 'kirill')) +
         ' · ' + escapeHtml(C.convert(word, 'lotin', 'yangi', opts)) + '</small></div>';
       card.onclick = function () {
@@ -699,8 +706,8 @@
   function applySettings() {
     if (S.theme) document.documentElement.setAttribute('data-theme', S.theme);
     else document.documentElement.removeAttribute('data-theme');
-    $('themeBtn').textContent = effectiveDark() ? '☀️' : '🌙';
-    $('soundBtn').textContent = S.sound ? '🔊' : '🔇';
+    $('themeBtn').innerHTML = window.uzIcon(effectiveDark() ? 'sun' : 'moon');
+    $('soundBtn').innerHTML = window.uzIcon(S.sound ? 'volume' : 'volume-off');
     $('kbEditor').classList.toggle('fingers', S.fingers);
     $('kbTrainer').classList.toggle('fingers', S.fingers);
     $('kbTrainer').classList.toggle('no-target', !S.targetHint);
@@ -722,7 +729,7 @@
     $('convAscii').checked = S.convAscii;
   }
 
-  $('soundBtn').onclick = function () { S.sound = !S.sound; save(); applySettings(); toast(S.sound ? '🔊 Ovoz yoqildi' : '🔇 Ovoz oʻchirildi'); };
+  $('soundBtn').onclick = function () { S.sound = !S.sound; save(); applySettings(); toast(S.sound ? 'Tugma ovozi yoqildi' : 'Tugma ovozi oʻchirildi', 'info'); };
   $('themeBtn').onclick = function () {
     S.theme = effectiveDark() ? 'light' : 'dark';
     save(); applySettings(); renderHistory();

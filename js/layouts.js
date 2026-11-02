@@ -25,9 +25,9 @@
   ];
 
   var ACTION_LABELS = {
-    Backspace: '⌫', Tab: 'Tab ⇥', CapsLock: 'Caps', Enter: 'Enter ↵',
-    ShiftLeft: '⇧ Shift', ShiftRight: '⇧ Shift', Space: '', AltLeft: 'Alt',
-    AltRight: 'Alt', ArrowLeft: '←', ArrowRight: '→', Lang: '🌐'
+    Backspace: '', Tab: 'Tab', CapsLock: 'Caps Lock', Enter: 'Enter',
+    ShiftLeft: 'Shift', ShiftRight: 'Shift', Space: '', AltLeft: 'Alt',
+    AltRight: 'Alt', ArrowLeft: '', ArrowRight: '', Lang: ''
   };
 
   /* Standart US (QWERTY) */
