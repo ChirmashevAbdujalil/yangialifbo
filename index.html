@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yangi Alifbo — onlayn oʻzbek klaviaturasi</title>
+  <meta name="description" content="Onlayn oʻzbek klaviaturasi: lotin, kirill va yangi alifbo. Tez yozish mashqi, kirill-lotin konvertori, tutuq belgilarini tuzatish.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f766e'/%3E%3Ctext x='32' y='44' font-size='34' font-family='Arial' font-weight='700' fill='white' text-anchor='middle'%3EA%CA%BB%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Mavzuni sahifa chizilishidan oldin qo'llash (miltillamasligi uchun)
+    try {
+      var s = JSON.parse(localStorage.getItem('ya_settings') || '{}');
+      if (s.theme) document.documentElement.setAttribute('data-theme', s.theme);
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">Aʻ</span>
+      <div class="brand-text">
+        <b>Yangi Alifbo</b>
+        <small>onlayn oʻzbek klaviaturasi</small>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="Boʻlimlar">
+      <button class="tab active" role="tab" data-tab="editor" aria-selected="true">⌨️ <span>Klaviatura</span></button>
+      <button class="tab" role="tab" data-tab="trainer" aria-selected="false">🏁 <span>Mashq</span></button>
+      <button class="tab" role="tab" data-tab="converter" aria-selected="false">🔄 <span>Konvertor</span></button>
+      <button class="tab" role="tab" data-tab="alphabet" aria-selected="false">🔤 <span>Alifbo</span></button>
+    </nav>
+
+    <div class="top-actions">
+      <div class="seg" id="layoutSeg" role="radiogroup" aria-label="Yozuv">
+        <button data-layout="lotin" role="radio">Lotin</button>
+        <button data-layout="kirill" role="radio">Кирилл</button>
+        <button data-layout="yangi" role="radio">Yangi</button>
+      </div>
+      <button class="icon-btn" id="soundBtn" title="Tugma ovozi">🔊</button>
+      <button class="icon-btn" id="themeBtn" title="Kun / tun rejimi">🌙</button>
+      <button class="icon-btn" id="settingsBtn" title="Sozlamalar">⚙️</button>
+      <button class="icon-btn" id="helpBtn" title="Yordam">❔</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ KLAVIATURA / MATN MUHARRIRI ============ -->
+    <section class="panel active" id="tab-editor" role="tabpanel">
+      <div class="toolbar">
+        <div class="tool-group">
+          <button class="btn" id="copyBtn" title="Nusxa olish (Ctrl+Shift+C)">📋 Nusxa</button>
+          <button class="btn" id="downloadBtn" title="Matnni .txt fayl qilib saqlash">💾 Saqlash</button>
+          <label class="btn" title="Matnli faylni ochish">📂 Ochish<input type="file" id="openFile" accept=".txt,text/plain" hidden></label>
+          <button class="btn" id="fixBtn" title="o' g' va tutuq belgilarini toʻgʻri ʻ ʼ belgilariga almashtirish">✨ Tutuqni tuzatish</button>
+          <button class="btn" id="toConverterBtn" title="Matnni konvertorga yuborish">🔄 Oʻgirish</button>
+        </div>
+        <div class="tool-group">
+          <button class="btn" id="fontMinus" title="Shriftni kichraytirish">A−</button>
+          <button class="btn" id="fontPlus" title="Shriftni kattalashtirish">A+</button>
+          <button class="btn danger" id="clearBtn" title="Matnni tozalash">🗑 Tozalash</button>
+        </div>
+      </div>
+
+      <div class="editor-wrap">
+        <textarea id="editor" spellcheck="false" autocomplete="off" autocapitalize="off"
+          placeholder="Shu yerga yozing… Klaviaturangiz qaysi tilda boʻlishidan qatʼi nazar, tanlangan yozuvda (Lotin / Кирилл / Yangi) yoziladi."></textarea>
+        <div class="editor-status">
+          <span id="cntChars">0 belgi</span>
+          <span id="cntWords">0 soʻz</span>
+          <span id="cntLines">1 qator</span>
+          <span class="muted" id="saveState">Avtomatik saqlanadi</span>
+        </div>
+      </div>
+
+      <div class="kb-wrap">
+        <div id="kbEditor"></div>
+        <p class="hint" id="editorHint"></p>
+      </div>
+    </section>
+
+    <!-- ============ MASHQ ============ -->
+    <section class="panel" id="tab-trainer" role="tabpanel">
+      <div class="trainer-controls">
+        <label class="field">
+          <span>Dars</span>
+          <select id="lessonSel"></select>
+        </label>
+        <label class="field">
+          <span>Vaqt</span>
+          <select id="durationSel">
+            <option value="15">15 soniya</option>
+            <option value="30">30 soniya</option>
+            <option value="60" selected>1 daqiqa</option>
+            <option value="120">2 daqiqa</option>
+            <option value="300">5 daqiqa</option>
+            <option value="0">Matn tugaguncha</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="optBackspace" checked> Oʻchirishga ruxsat</label>
+        <label class="check"><input type="checkbox" id="optStop"> Xatoda toʻxtash</label>
+        <button class="btn primary" id="restartBtn">↻ Qayta boshlash</button>
+      </div>
+
+      <div class="custom-wrap" id="customWrap" hidden>
+        <textarea id="customText" rows="3" placeholder="Mashq qilmoqchi boʻlgan matningizni shu yerga kiriting yoki joylang…"></textarea>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat"><b id="stTime">1:00</b><span id="stTimeLabel">Qolgan vaqt</span></div>
+        <div class="stat accent"><b id="stWpm">0</b><span>soʻz/daq</span></div>
+        <div class="stat"><b id="stCpm">0</b><span>belgi/daq</span></div>
+        <div class="stat"><b id="stAcc">100%</b><span>aniqlik</span></div>
+        <div class="stat"><b id="stErr">0</b><span>xato</span></div>
+      </div>
+      <div class="progress"><div class="progress-bar" id="stProgress"></div></div>
+
+      <div class="typing-box" id="typingBox" tabindex="0" aria-label="Mashq matni">
+        <div class="typing-text" id="typingText"></div>
+        <div class="typing-overlay" id="typingOverlay">Boshlash uchun yozishni boshlang</div>
+      </div>
+
+      <div class="kb-wrap">
+        <div id="kbTrainer"></div>
+        <div class="kb-tools">
+          <label class="check"><input type="checkbox" id="optHeat"> Xatolar xaritasi</label>
+          <label class="check"><input type="checkbox" id="optTargetHint" checked> Keyingi tugmani koʻrsatish</label>
+          <button class="btn small" id="resetHeat">Xaritani tozalash</button>
+        </div>
+      </div>
+
+      <div class="history">
+        <div class="card">
+          <h3>📈 Natijalar dinamikasi</h3>
+          <canvas id="historyChart" height="160" aria-label="Natijalar grafigi"></canvas>
+          <div class="best-row">
+            <div><span class="muted">Eng yaxshi</span><b id="bestWpm">—</b></div>
+            <div><span class="muted">Oʻrtacha</span><b id="avgWpm">—</b></div>
+            <div><span class="muted">Mashqlar</span><b id="totalRuns">0</b></div>
+            <div><span class="muted">Daraja</span><b id="rankName">—</b></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>🗂 Soʻnggi natijalar <button class="btn small ghost" id="clearHistory">Tozalash</button></h3>
+          <div class="table-scroll">
+            <table class="table" id="historyTable">
+              <thead><tr><th>Sana</th><th>Dars</th><th>Yozuv</th><th>Soʻz/daq</th><th>Aniqlik</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ KONVERTOR ============ -->
+    <section class="panel" id="tab-converter" role="tabpanel">
+      <div class="conv-head">
+        <label class="field">
+          <span>Qaysi yozuvdan</span>
+          <select id="convFrom">
+            <option value="auto">🔍 Avtomatik aniqlash</option>
+            <option value="kirill">Кирилл</option>
+            <option value="lotin">Lotin</option>
+            <option value="yangi">Yangi alifbo</option>
+          </select>
+        </label>
+        <button class="btn icon swap" id="swapBtn" title="Almashtirish">⇄</button>
+        <label class="field">
+          <span>Qaysi yozuvga</span>
+          <select id="convTo">
+            <option value="lotin">Lotin</option>
+            <option value="kirill">Кирилл</option>
+            <option value="yangi">Yangi alifbo</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="convAscii"> ʻ ʼ oʻrniga oddiy ' ishlatish</label>
+      </div>
+
+      <div class="conv-grid">
+        <div class="conv-box">
+          <div class="conv-box-head">
+            <b>Asl matn</b>
+            <span class="muted" id="convDetected"></span>
+            <div class="spacer"></div>
+            <label class="btn small">📂 Fayl<input type="file" id="convFile" accept=".txt,text/plain" hidden></label>
+            <button class="btn small" id="convPaste">📥 Joylash</button>
+            <button class="btn small ghost" id="convClear">🗑</button>
+          </div>
+          <textarea id="convIn" spellcheck="false" placeholder="Oʻgirmoqchi boʻlgan matnni shu yerga yozing yoki joylang…"></textarea>
+          <div class="muted small" id="convInCount">0 belgi</div>
+        </div>
+        <div class="conv-box">
+          <div class="conv-box-head">
+            <b>Natija</b>
+            <div class="spacer"></div>
+            <button class="btn small" id="convCopy">📋 Nusxa</button>
+            <button class="btn small" id="convDownload">💾 Saqlash</button>
+            <button class="btn small" id="convToEditor">⌨️ Muharrirga</button>
+          </div>
+          <textarea id="convOut" spellcheck="false" readonly placeholder="Natija shu yerda paydo boʻladi…"></textarea>
+          <div class="muted small" id="convOutCount">0 belgi</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ALIFBO ============ -->
+    <section class="panel" id="tab-alphabet" role="tabpanel">
+      <div class="alpha-head">
+        <h2>Oʻzbek alifbosi: Kirill — Lotin — Yangi</h2>
+        <p class="muted">Harf ustiga bossangiz, u muharrirga qoʻshiladi. Yangi alifbo — taklif etilgan loyiha boʻyicha (variantni sozlamalardan tanlash mumkin).</p>
+      </div>
+      <div class="alpha-grid" id="alphaGrid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>© <span id="year"></span> Yangi Alifbo · Oddiy HTML, CSS va JavaScript — internet va serversiz ham ishlaydi</span>
+  </footer>
+
+  <!-- ============ SOZLAMALAR ============ -->
+  <div class="modal" id="settingsModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+      <div class="modal-head"><h3 id="setTitle">⚙️ Sozlamalar</h3><button class="icon-btn close" data-close>✕</button></div>
+      <div class="modal-body settings">
+        <label class="field">
+          <span>Yangi alifbo varianti</span>
+          <select id="setVariant">
+            <option value="A">Ş Ç Ğ Ö (ş, ç, ğ, ö)</option>
+            <option value="B">Ş Ç Ǵ Ó (ş, ç, ǵ, ó)</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="setAuto"> Yangi alifboda avtomatik almashtirish (sh → ş, ch → ç, o' → ö, g' → ğ)</label>
+        <label class="check"><input type="checkbox" id="setSmart"> Lotinda “aqlli” tutuq belgisi (' tugmasi: oʻ, gʻ dan keyin ʻ, boshqa joyda ʼ)</label>
+        <label class="check"><input type="checkbox" id="setMap"> Fizik klaviaturani tanlangan yozuvga moslash</label>
+        <label class="check"><input type="checkbox" id="setFingers"> Tugmalarni barmoqlar boʻyicha ranglash</label>
+        <label class="check"><input type="checkbox" id="setNoSysKb"> Telefonda tizim klaviaturasini yashirish (faqat ekrandagi klaviatura)</label>
+        <label class="check"><input type="checkbox" id="setErrSound"> Mashqda xato boʻlsa ovozli signal</label>
+        <label class="field">
+          <span>Mavzu</span>
+          <select id="setTheme">
+            <option value="">Tizim boʻyicha</option>
+            <option value="light">Kunduzgi</option>
+            <option value="dark">Tungi</option>
+          </select>
+        </label>
+        <button class="btn danger" id="resetAll">Barcha maʼlumotlarni oʻchirish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ YORDAM ============ -->
+  <div class="modal" id="helpModal" hidden>
+    <div class="modal-card wide" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="modal-head"><h3 id="helpTitle">❔ Qanday foydalaniladi</h3><button class="icon-btn close" data-close>✕</button></div>
+      <div class="modal-body help">
+        <h4>Asosiy imkoniyatlar</h4>
+        <ul>
+          <li><b>Klaviatura</b> — Lotin, Кирилл yoki Yangi alifboda yozing. Kompyuteringiz tili inglizcha yoki ruscha boʻlsa ham, tanlangan yozuvda yoziladi.</li>
+          <li><b>Mashq</b> — tez yozishni oʻrganing: darslar, vaqt, soʻz/daqiqa, aniqlik, xatolar xaritasi va natijalar tarixi.</li>
+          <li><b>Konvertor</b> — matnni Kirill ⇄ Lotin ⇄ Yangi alifboga oʻgiring, fayldan oching va saqlang.</li>
+          <li><b>Alifbo</b> — harflar jadvali va misollar.</li>
+        </ul>
+        <h4>Tezkor tugmalar</h4>
+        <table class="table keys-table">
+          <tr><td><kbd>Alt</kbd> + <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd></td><td>Lotin / Кирилл / Yangi yozuvga oʻtish</td></tr>
+          <tr><td><kbd>Alt</kbd> + <kbd>O</kbd></td><td>oʻ (yangi alifboda ö)</td></tr>
+          <tr><td><kbd>Alt</kbd> + <kbd>G</kbd></td><td>gʻ (yangi alifboda ğ)</td></tr>
+          <tr><td><kbd>Alt</kbd> + <kbd>S</kbd> / <kbd>C</kbd></td><td>sh / ch (yangi alifboda ş / ç)</td></tr>
+          <tr><td><kbd>Alt</kbd> + <kbd>'</kbd></td><td>tutuq belgisi ʼ</td></tr>
+          <tr><td><kbd>Alt</kbd> + boshqa tugma</td><td>Asl (inglizcha) belgi</td></tr>
+          <tr><td><kbd>'</kbd> (Lotin)</td><td>“aqlli” tutuq: o va g dan keyin ʻ, boshqa joyda ʼ</td></tr>
+          <tr><td><kbd>[</kbd> <kbd>]</kbd> <kbd>;</kbd> <kbd>'</kbd> <kbd>`</kbd> (Yangi)</td><td>ğ, ö, ş, ç, ʼ</td></tr>
+          <tr><td><kbd>Esc</kbd> (Mashq)</td><td>Qayta boshlash</td></tr>
+          <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd></td><td>Butun matndan nusxa olish</td></tr>
+        </table>
+        <h4>Kirill joylashuvi</h4>
+        <p>Windows uchun standart oʻzbek kirill joylashuvi: <kbd>O</kbd> → ў, <kbd>S</kbd> → қ, <kbd>-</kbd> → ғ, <kbd>=</kbd> → ҳ, <kbd>\</kbd> → chiziqcha (-).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ NATIJA ============ -->
+  <div class="modal" id="resultModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="resTitle">
+      <div class="modal-head"><h3 id="resTitle">🏆 Natija</h3><button class="icon-btn close" data-close>✕</button></div>
+      <div class="modal-body">
+        <div class="result-big"><b id="resWpm">0</b><span>soʻz / daqiqa</span></div>
+        <div class="result-grid">
+          <div><b id="resAcc">0%</b><span>aniqlik</span></div>
+          <div><b id="resCpm">0</b><span>belgi / daq</span></div>
+          <div><b id="resErr">0</b><span>xato</span></div>
+          <div><b id="resTime">0:00</b><span>vaqt</span></div>
+        </div>
+        <p class="result-rank" id="resRank"></p>
+        <p class="muted" id="resWeak"></p>
+        <div class="modal-actions">
+          <button class="btn primary" id="resAgain">↻ Yana bir bor</button>
+          <button class="btn" data-close>Yopish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/converter.js"></script>
+  <script src="js/layouts.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/keyboard.js"></script>
+  <script src="js/trainer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
