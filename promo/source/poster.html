@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px; height: 1080px; overflow: hidden; position: relative;
+    font-family: "Segoe UI", system-ui, Roboto, "Noto Sans", Arial, sans-serif;
+    color: #fff;
+    background:
+      radial-gradient(1200px 700px at 78% 40%, rgba(46, 123, 207, .35), transparent 60%),
+      linear-gradient(135deg, #07264a 0%, #0b3a6e 55%, #0a3260 100%);
+  }
+  /* nozik to'r naqshi */
+  body::before {
+    content: ""; position: absolute; inset: 0; opacity: .07;
+    background-image:
+      linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: linear-gradient(90deg, transparent 0%, #000 45%, #000 100%);
+  }
+  .i { fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+  .flag {
+    position: absolute; left: 0; right: 0; height: 14px;
+    background: linear-gradient(to bottom, #0099b5 0 34%, #ce1126 34% 40%, #fff 40% 60%, #ce1126 60% 66%, #1eb53a 66% 100%);
+  }
+  .flag.top { top: 0; }
+
+  /* Sarlavha qatori */
+  .header {
+    position: absolute; top: 58px; left: 96px; right: 96px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 18px; }
+  .emblem {
+    width: 64px; height: 64px; border: 2.5px solid rgba(255,255,255,.65); border-radius: 10px;
+    display: grid; place-items: center;
+  }
+  .emblem svg { width: 38px; height: 38px; }
+  .brand b { font-size: 34px; letter-spacing: .16em; font-weight: 800; }
+  .brand small { display: block; font-size: 17px; color: #b8c7da; letter-spacing: .02em; margin-top: 2px; }
+  .badge-free {
+    display: flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 999px;
+    background: rgba(255,255,255,.08); border: 1.5px solid rgba(255,255,255,.25);
+    font-size: 20px; font-weight: 600; color: #e6eef8;
+  }
+  .badge-free i { width: 10px; height: 10px; border-radius: 50%; background: #3fd17a; box-shadow: 0 0 0 4px rgba(63,209,122,.2); }
+
+  /* Chap ustun */
+  .left { position: absolute; left: 96px; top: 190px; width: 820px; }
+  .kicker {
+    display: inline-block; font-size: 18px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: #8fd0ff; padding-bottom: 10px; border-bottom: 3px solid #1eb53a; margin-bottom: 26px;
+  }
+  h1 { font-size: 62px; line-height: 1.1; font-weight: 800; letter-spacing: -.015em; }
+  h1 .accent { color: #8fd0ff; }
+  .lead { margin-top: 22px; font-size: 24px; line-height: 1.45; color: #cfdbea; max-width: 780px; }
+
+  .example {
+    margin-top: 30px; display: inline-flex; align-items: center; gap: 16px;
+    padding: 14px 22px; border-radius: 12px; background: rgba(4, 22, 44, .45); border: 1.5px solid rgba(255,255,255,.18);
+    font-size: 28px; font-weight: 700;
+  }
+  .example .arr { color: #7f93ab; font-weight: 400; }
+  .example .lat { color: #8fd0ff; }
+  .example .new { color: #7be3a0; }
+  .example small { display: block; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #93a6bd; margin-bottom: 2px; }
+
+  .features { margin-top: 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 22px; }
+  .feat { display: flex; gap: 16px; align-items: flex-start; }
+  .feat .ic {
+    flex: 0 0 auto; width: 52px; height: 52px; border-radius: 12px;
+    display: grid; place-items: center; background: rgba(143, 208, 255, .12); color: #8fd0ff;
+    border: 1.5px solid rgba(143, 208, 255, .28);
+  }
+  .feat .ic svg { width: 27px; height: 27px; }
+  .feat.hl .ic { background: #2b579a; color: #fff; border-color: #5d86c8; }
+  .feat b { display: block; font-size: 21px; line-height: 1.25; }
+  .feat span { display: block; font-size: 17px; color: #b8c7da; margin-top: 3px; line-height: 1.35; }
+
+  /* O'ng ustun: brauzer oynasi */
+  .right { position: absolute; right: 80px; top: 222px; width: 900px; }
+  .window {
+    border-radius: 14px; overflow: hidden; background: #fff;
+    box-shadow: 0 40px 90px rgba(0, 8, 20, .55), 0 0 0 1px rgba(255,255,255,.12);
+    transform: perspective(2400px) rotateY(-6deg) rotateX(2deg); transform-origin: left center;
+  }
+  .chrome { height: 42px; background: #e9edf2; display: flex; align-items: center; gap: 9px; padding: 0 16px; }
+  .chrome i { width: 13px; height: 13px; border-radius: 50%; display: block; }
+  .chrome i:nth-child(1) { background: #ff5f57; } .chrome i:nth-child(2) { background: #febc2e; } .chrome i:nth-child(3) { background: #28c840; }
+  .chrome .url {
+    margin-left: 18px; flex: 1; height: 26px; border-radius: 6px; background: #fff; color: #5a6678;
+    font-size: 14px; display: flex; align-items: center; padding: 0 12px; gap: 8px;
+  }
+  .chrome .url svg { width: 14px; height: 14px; color: #1a7f37; }
+  .window img { display: block; width: 100%; }
+
+  .float {
+    position: absolute; left: 30px; bottom: -44px; width: 580px;
+    display: flex; gap: 16px; align-items: center; padding: 18px 22px;
+    background: #fff; color: #1b2638; border-radius: 14px; border-left: 6px solid #2b579a;
+    box-shadow: 0 24px 60px rgba(0, 8, 20, .45);
+  }
+  .float .doc { width: 54px; height: 54px; border-radius: 10px; background: #2b579a; color: #fff; display: grid; place-items: center; flex: 0 0 auto; }
+  .float .doc svg { width: 30px; height: 30px; }
+  .float b { display: block; font-size: 20px; }
+  .float span { display: block; font-size: 15.5px; color: #5a6678; margin-top: 2px; line-height: 1.35; }
+  .float .ok { color: #1a7f37; font-weight: 700; }
+
+  /* Pastki qism */
+  .bottom {
+    position: absolute; left: 0; right: 0; bottom: 14px; height: 96px;
+    background: rgba(3, 17, 34, .55); border-top: 1px solid rgba(255,255,255,.12);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 96px;
+    font-size: 21px; color: #b8c7da;
+  }
+  .bottom .item { display: flex; align-items: center; gap: 14px; }
+  .bottom .item svg { width: 30px; height: 30px; color: #fff; }
+  .bottom small { display: block; font-size: 14px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: #8ea3bb; }
+  .bottom b { color: #fff; font-weight: 600; font-size: 23px; }
+  .flag.bot { bottom: 0; }
+</style>
+</head>
+<body>
+  <div class="flag top"></div>
+
+  <div class="header">
+    <div class="brand">
+      <div class="emblem"><svg class="i" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M8 13h.01M12 13h.01M16 13h.01M7 16h10"/></svg></div>
+      <div><b>YANGI ALIFBO</b><small>Oʻzbek tili uchun onlayn platforma</small></div>
+    </div>
+    <div class="badge-free"><i></i>Bepul · Roʻyxatdan oʻtish shart emas</div>
+  </div>
+
+  <div class="left">
+    <div class="kicker">Yangi onlayn platforma</div>
+    <h1><span class="accent">Kirill ⇄ Lotin ⇄ Yangi alifbo</span><br>konvertori va yangi<br>oʻzbek klaviaturasi</h1>
+    <p class="lead">Matn va Word hujjatlarni bir zumda oʻgiring, istalgan qurilmada oʻzbekcha toʻgʻri yozing.</p>
+
+    <div class="example">
+      <div><small>Kirill</small>Ўзбекистон</div><span class="arr">→</span>
+      <div><small>Lotin</small><span class="lat">Oʻzbekiston</span></div><span class="arr">→</span>
+      <div><small>Yangi alifbo</small><span class="new">Özbekiston</span></div>
+    </div>
+
+    <div class="features">
+      <div class="feat hl">
+        <div class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><path d="M14 2v6h6"/><path d="m8 12 1.5 6 2.5-4.5 2.5 4.5L16 12"/></svg></div>
+        <div><b>Word hujjatlarni oʻgirish</b><span>Format va joylashuv oʻzgarmaydi</span></div>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg></div>
+        <div><b>Aqlli konvertor</b><span>Yozuvni oʻzi aniqlaydi, imlo qoidalariga amal qiladi</span></div>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg class="i" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M8 13h.01M12 13h.01M16 13h.01M7 16h10"/></svg></div>
+        <div><b>Onlayn klaviatura</b><span>Lotin, kirill va yangi alifboda — kompyuter va telefonda</span></div>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg class="i" viewBox="0 0 24 24"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg></div>
+        <div><b>Tez yozish mashqi</b><span>10 ta dars, tezlik va aniqlik tahlili</span></div>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div><b>Oʻzbek alifbosi jadvali</b><span>Har bir harf uch yozuvda, misollar bilan</span></div>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div><b>Maxfiylik kafolati</b><span>Hujjatlar hech qayerga yuborilmaydi</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="window">
+      <div class="chrome"><i></i><i></i><i></i>
+        <div class="url"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Yangi Alifbo — Yozuv konvertori</div>
+      </div>
+      <img src="shot.png" alt="">
+    </div>
+    <div class="float">
+      <div class="doc"><svg class="i" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><path d="M14 2v6h6"/><path d="m8 12 1.5 6 2.5-4.5 2.5 4.5L16 12"/></svg></div>
+      <div><b>Hisobot_2026.docx</b><span>Kirill → Yangi alifbo · <span class="ok" style="display:inline">shrift, jadval va rasmlar saqlandi</span></span></div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="item">
+      <svg class="i" viewBox="0 0 24 24"><path d="M3 22h18"/><path d="M6 18v-7M10 18v-7M14 18v-7M18 18v-7"/><path d="M12 2 21 7H3z"/></svg>
+      <div><small>Dastur homiysi</small><b>Andijon davlat texnika instituti matbuot xizmati</b></div>
+    </div>
+    <div class="item">
+      <svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>
+      <div><small>Dasturchi</small><b>Abdujalil Chirmashev</b></div>
+    </div>
+  </div>
+  <div class="flag bot"></div>
+</body>
+</html>
