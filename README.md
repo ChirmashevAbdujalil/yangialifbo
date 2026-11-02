@@ -10,6 +10,9 @@ Dasturchi: **Abdujalil Chirmashev** · Dastur homiysi: **Andijon davlat texnika 
 
 ### Konvertor
 - Kirill ⇄ Lotin ⇄ Yangi alifbo, yozuvni avtomatik aniqlash.
+- Aralash va “iflos” matnlar ham oxirigacha oʻgiriladi: bir matnda kirill, lotin va qisman yangi
+  alifbo boʻlsa; lotin soʻz ichida koʻrinishi bir xil kirill harflari (с, о, һ) uchrasa;
+  tutuq belgisi har xil yozilgan boʻlsa (' ` ‘ ’ ʻ ʼ ′ va boshqalar).
 - Toʻgʻri qoidalar: е → ye/e, ц → s/ts, ъ → ʼ, ё/ю/я, `sʼh` (Isʼhoq), katta harfli soʻzlar (ШАХМАТ → SHAXMAT).
 - **Word (.docx) hujjatlarni oʻgirish**: hujjat yuklanadi, oʻgiriladi va yana .docx sifatida
   yuklab olinadi. Shrift, qalin/kursiv, jadval, rasm, kolontitul va izohlar saqlanadi.

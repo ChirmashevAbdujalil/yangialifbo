@@ -537,16 +537,19 @@
     var from = $('convFrom').value;
     var to = $('convTo').value;
     var det = '';
+    var shown = from;
     if (from === 'auto') {
-      from = C.detect(text);
-      det = text ? 'Aniqlandi: ' + L.NAMES[from] : '';
+      // Aniqlangan yozuv faqat ko'rsatish uchun; o'girish "auto" rejimida bajariladi —
+      // matnning har bir qismi (kirill, lotin, yangi alifbo aralash bo'lsa ham) oxirigacha o'giriladi
+      shown = C.detect(text);
+      det = text ? 'Aniqlandi: ' + L.NAMES[shown] : '';
     }
     $('convDetected').textContent = det;
     $('convDetected').hidden = !det;
     convOut.value = C.convert(text, from, to, { variant: S.variant, ascii: S.convAscii });
     $('convInCount').textContent = text.length + ' belgi';
     $('convOutCount').textContent = convOut.value.length + ' belgi';
-    if (from === to && text) {
+    if (shown === to && text) {
       $('convDetected').textContent = (det ? det + ' · ' : '') + 'yozuvlar bir xil';
       $('convDetected').hidden = false;
     }
@@ -614,10 +617,9 @@
   $('docxDownload').onclick = function () {
     if (!docx) return;
     var btn = this;
+    // "auto" — hujjatdagi aralash yozuvlar ham to'liq o'giriladi (qisman o'girilgan hujjatlarni yakunlash mumkin)
     var from = $('convFrom').value;
-    if (from === 'auto') from = C.detect(docx.text || '');
     var to = $('convTo').value;
-    if (from === to) { toast('Manba va natija yozuvi bir xil', 'info'); return; }
     var suffix = { lotin: 'lotin', kirill: 'kirill', yangi: 'yangi-alifbo' }[to];
     var name = docx.name.replace(/\.docx$/i, '') + '_' + suffix + '.docx';
     btn.disabled = true;

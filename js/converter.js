@@ -11,7 +11,8 @@
 
   var OKINA = 'ʻ'; // ʻ  (oʻ, gʻ uchun)
   var APOS = 'ʼ';  // ʼ  (tutuq belgisi)
-  var ANY_APOS = "'`‘’ʻʼ´ʹ";
+  // Matnlarda tutuq sifatida uchraydigan barcha belgilar: ' ` ‘ ’ ʻ ʼ ´ ʹ ′ ‛ ʽ ＇ ˊ
+  var ANY_APOS = "'`‘’ʻʼ´ʹ′‛ʽ＇ˊ";
 
   var VOWELS_LAT = 'aeiouAEIOU';
   var VOWELS_CYR = 'аеёиоуэюяўАЕЁИОУЭЮЯЎ';
@@ -245,16 +246,87 @@
     return text.replace(/[ʻʼ]/g, "'");
   }
 
+  /* ---------------- Ko'rinishi bir xil harflar (gomogliflar) ----------------
+   * Internetdan ko'chirilgan matnlarda lotin so'z ichida kirill "с", "о", "һ" kabi harflar
+   * uchraydi (masalan, "сhoy" — birinchi harf kirillcha). Asosan lotincha so'z ichidagi
+   * bunday harflar ko'rinishi bo'yicha lotinga almashtiriladi (uzunlik o'zgarmaydi). */
+  var HOMO = {
+    'а': 'a', 'е': 'e', 'о': 'o', 'р': 'p', 'с': 'c', 'у': 'y', 'х': 'x', 'һ': 'h', 'і': 'i',
+    'ј': 'j', 'ѕ': 's', 'ԛ': 'q', 'ԁ': 'd', 'к': 'k', 'м': 'm', 'т': 't',
+    'А': 'A', 'В': 'B', 'Е': 'E', 'К': 'K', 'М': 'M', 'Н': 'H', 'О': 'O', 'Р': 'P', 'С': 'C',
+    'Т': 'T', 'У': 'Y', 'Х': 'X', 'Һ': 'H', 'І': 'I', 'Ј': 'J', 'Ѕ': 'S'
+  };
+  function isCyr(c) { return c >= 'Ѐ' && c <= 'ӿ'; }
+  function fixHomoglyphs(text) {
+    var out = '';
+    var i = 0;
+    var n = text.length;
+    while (i < n) {
+      var c0 = text.charAt(i);
+      if (!isLetter(c0) && !isApos(c0)) { out += c0; i++; continue; }
+      var j = i, lat = 0, cyr = 0;
+      while (j < n && (isLetter(text.charAt(j)) || isApos(text.charAt(j)))) {
+        var ch = text.charAt(j);
+        if (isCyr(ch)) cyr++; else if (isLetter(ch)) lat++;
+        j++;
+      }
+      var word = text.slice(i, j);
+      if (cyr && lat > cyr) {
+        var w = '';
+        for (var k = 0; k < word.length; k++) {
+          var c = word.charAt(k);
+          w += Object.prototype.hasOwnProperty.call(HOMO, c) ? HOMO[c] : c;
+        }
+        word = w;
+      }
+      out += word;
+      i = j;
+    }
+    return out;
+  }
+
+  /* Yangi alifbo harflarini lotin harf birikmalariga (aralash matnlar uchun; mavjud "sh" ga tegmaydi) */
+  function newLettersToLatT(text) {
+    var t = new Tokens();
+    for (var i = 0; i < text.length; i++) {
+      var ch = text.charAt(i);
+      if (Object.prototype.hasOwnProperty.call(NEW2L, ch)) {
+        t.push(i, applyCase(ch, NEW2L[ch], capsContext(text, i, 1)));
+      } else {
+        t.push(i, ch);
+      }
+    }
+    return t;
+  }
+
+  /*
+   * Har qanday (aralash) matnni joriy lotin yozuviga keltirish: gomogliflar, kirill harflari,
+   * yangi alifbo harflari va tutuq belgilari — hammasi bitta matnda bo'lsa ham.
+   */
+  function anyToLatT(text) {
+    var t0 = identity(fixHomoglyphs(text));
+    var t1 = compose(t0, cyrToLatT(t0.text()));
+    var t2 = compose(t1, newLettersToLatT(t1.text()));
+    return compose(t2, identity(normalizeApostrophes(t2.text())));
+  }
+
+  /* Matn aniq yangi alifboda deb belgilanganda: "sh" — s + h (Isʼhoq); kirill harflari ham o'giriladi */
+  function strictNewToLatT(text) {
+    var t0 = identity(fixHomoglyphs(text));
+    var t1 = compose(t0, newToLatT(t0.text()));
+    var t2 = compose(t1, cyrToLatT(t1.text()));
+    return compose(t2, identity(normalizeApostrophes(t2.text())));
+  }
+
   /**
    * convertMapped(text, from, to, opts) -> { s: [...], o: [...] }
    * Har bir natija bo'lagi (o[i]) manbadagi qaysi belgidan (s[i]) boshlanganini bildiradi.
    */
   function convertMapped(text, from, to, opts) {
     opts = opts || {};
-    var t1;
-    if (from === 'kirill') t1 = cyrToLatT(text);
-    else if (from === 'yangi') t1 = newToLatT(text);
-    else t1 = identity(normalizeApostrophes(text));
+    // "auto", "lotin" va "kirill" — universal yo'l: aralash matnlar ham oxirigacha o'giriladi.
+    // "yangi" — matn aniq yangi alifboda deb belgilanganda ("sh" = s + h).
+    var t1 = from === 'yangi' ? strictNewToLatT(text) : anyToLatT(text);
 
     var lat = t1.text();
     var res;
@@ -281,8 +353,10 @@
     var cyr = (text.match(/[Ѐ-ӿ]/g) || []).length;
     var lat = (text.match(/[A-Za-z]/g) || []).length;
     var nw = (text.match(/[şŞçÇğĞöÖóÓǵǴ]/g) || []).length;
+    // joriy lotin yozuvi belgilari: sh, ch, oʻ, gʻ — qaysi yozuv ko'pchilik ekani hisoblanadi
+    var old = (text.match(/[sScC][hH]|[oOgG]['`‘’ʻʼ′]/g) || []).length;
     if (cyr > lat) return 'kirill';
-    if (nw > 0) return 'yangi';
+    if (nw > old) return 'yangi';
     return 'lotin';
   }
 
@@ -294,6 +368,7 @@
     isLetter: isLetter,
     isUpper: isUpper,
     normalizeApostrophes: normalizeApostrophes,
+    fixHomoglyphs: fixHomoglyphs,
     cyrToLat: function (s) { return cyrToLatT(s).text(); },
     latToCyr: function (s) { return latToCyrT(s).text(); },
     latToNew: function (s, v) { return latToNewT(s, v).text(); },
