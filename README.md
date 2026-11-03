@@ -20,6 +20,17 @@ Dasturchi: **Abdujalil Chirmashev** · Dastur homiysi: **Andijon davlat texnika 
 - Faylni (.txt yoki .docx) matn maydoniga sudrab tashlash mumkin.
 - Fayldan yuklash, nusxa olish, saqlash, natijani muharrirga oʻtkazish.
 
+### Word qoʻshimchasi (Microsoft Word ichida)
+- Saytdagi **«Word dasturiga qoʻshish»** tugmasi — oʻrnatish fayli (`manifest.xml`) va yoʻriqnoma
+  (Word Online, Windows, Mac, tashkilot uchun Microsoft 365 orqali).
+- Word lentasida **«Yangi Alifbo»** tugmasi paydo boʻladi, yon panelda:
+  belgilangan matnni oʻgirish, butun hujjatni (jadvallar va kolontitullar bilan) oʻgirish,
+  tutuq belgilarini tuzatish. Saytdagi konvertorning aynan oʻzi ishlatiladi.
+- Formatlash saqlanadi: har bir paragraf OOXML koʻrinishida olinadi va faqat matn boʻlaklari
+  (`w:t`) almashtiriladi. Natija yoqmasa — `Ctrl+Z`.
+- Talab: Word 2016 va yangilari / Microsoft 365 / Word Online (WordApi 1.3). Qoʻshimcha sayt
+  joylangan manzildan (`https://yangialifbouz.vercel.app/word-addin/`) yuklanadi.
+
 ### Klaviatura (matn muharriri)
 - Uchta yozuv: **Lotin**, **Кирилл** va **Yangi alifbo** (loyiha).
 - Kompyuteringiz tili inglizcha yoki ruscha boʻlsa ham, matn tanlangan yozuvda yoziladi
@@ -99,6 +110,8 @@ admin/stats.js    — statistika boʻlimi
 admin/lib.php     — statistika ombori (PHP)
 admin/data/       — statistika fayli (server yozishi mumkin boʻlishi kerak)
 og-image.png      — ijtimoiy tarmoqlarda havola ulashilganda chiqadigan rasm
+word-addin/       — Microsoft Word qoʻshimchasi: manifest.xml, panel (taskpane.*), ikonkalar
+promo/            — reklama posteri (16:9 PNG) va uning manbasi
 ```
 
 ## Ishga tushirish
@@ -135,6 +148,12 @@ yuklangan fayllar faqat haqiqiy rasm (PNG, JPG, GIF, WEBP) boʻlishi mumkin.
 3. Yuklab olingan `ads.json` faylini sayt papkasiga (`index.html` yoniga) joylang va saytni yangilang.
 
 Statik hostingda `admin/config.php` faylini yuklamang — u yerda PHP ishlamaydi va kerak emas.
+
+## Sayt manzili oʻzgarsa
+
+Sayt `https://yangialifbouz.vercel.app` manzilida. Manzil oʻzgarsa, quyidagilarni yangilang:
+`word-addin/manifest.xml` (barcha manzillar va `<Version>` raqamini oshirish) hamda
+`index.html` dagi `og:url`, `og:image`, `twitter:image`, `canonical`.
 
 ## Havola koʻrinishi (Telegram, Facebook)
 

@@ -16,7 +16,8 @@
   <meta property="og:locale" content="uz_UZ">
   <meta property="og:title" content="Yangi Alifbo — kirill-lotin konvertori va oʻzbek klaviaturasi">
   <meta property="og:description" content="Matn va Word hujjatlarni kirill, lotin va yangi alifbo oʻrtasida bepul oʻgiring. Onlayn klaviatura va tez yozish mashqi.">
-  <meta property="og:image" content="og-image.png">
+  <meta property="og:url" content="https://yangialifbouz.vercel.app/">
+  <meta property="og:image" content="https://yangialifbouz.vercel.app/og-image.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -24,7 +25,8 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Yangi Alifbo — kirill-lotin konvertori va oʻzbek klaviaturasi">
   <meta name="twitter:description" content="Matn va Word hujjatlarni kirill, lotin va yangi alifbo oʻrtasida bepul oʻgiring.">
-  <meta name="twitter:image" content="og-image.png">
+  <meta name="twitter:image" content="https://yangialifbouz.vercel.app/og-image.png">
+  <link rel="canonical" href="https://yangialifbouz.vercel.app/">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <script type="application/ld+json">
   {
@@ -149,9 +151,14 @@
 
     <!-- ============ KONVERTOR ============ -->
     <section class="panel active" id="tab-converter" role="tabpanel">
-      <div class="page-head">
-        <h1>Yozuv konvertori</h1>
-        <p>Matn va Word hujjatlarni kirill, lotin va yangi alifbo oʻrtasida amaldagi imlo qoidalari asosida oʻgiring.</p>
+      <div class="head-row">
+        <div class="page-head">
+          <h1>Yozuv konvertori</h1>
+          <p>Matn va Word hujjatlarni kirill, lotin va yangi alifbo oʻrtasida amaldagi imlo qoidalari asosida oʻgiring.</p>
+        </div>
+        <button class="btn word-btn" id="wordBtn" type="button" title="Konvertorni Microsoft Word dasturiga qoʻshimcha sifatida oʻrnatish">
+          <svg class="i"><use href="#i-word"/></svg><span>Word dasturiga qoʻshish</span>
+        </button>
       </div>
 
       <div class="box conv-head">
@@ -434,6 +441,74 @@
         </table>
         <h4>Kirill joylashuvi</h4>
         <p>Windows uchun standart oʻzbek kirill joylashuvi qoʻllanadi: <kbd>O</kbd> → ў, <kbd>S</kbd> → қ, <kbd>-</kbd> → ғ, <kbd>=</kbd> → ҳ, <kbd>\</kbd> → chiziqcha (-).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ WORD QO'SHIMCHASI ============ -->
+  <div class="modal" id="wordModal" hidden>
+    <div class="modal-card wide" role="dialog" aria-modal="true" aria-labelledby="wordTitle">
+      <div class="modal-head">
+        <h3 id="wordTitle"><svg class="i"><use href="#i-word"/></svg>Word dasturiga qoʻshish</h3>
+        <button class="icon-btn close" data-close aria-label="Yopish"><svg class="i"><use href="#i-close"/></svg></button>
+      </div>
+      <div class="modal-body word-help">
+        <p class="word-lead">Konvertorni <b>Microsoft Word</b> ichiga oʻrnating: lentadagi <b>«Yangi Alifbo»</b> tugmasi bosilganda
+          yon panel ochiladi va hujjatni toʻgʻridan-toʻgʻri Word’da oʻgirish mumkin — belgilangan matnni yoki butun hujjatni.
+          Shrift, jadval va rasmlar oʻzgarmaydi.</p>
+
+        <div class="word-download">
+          <a class="btn primary" href="word-addin/manifest.xml" download="yangi-alifbo-manifest.xml">
+            <svg class="i"><use href="#i-download"/></svg><span>Oʻrnatish faylini yuklab olish (manifest.xml)</span>
+          </a>
+          <span class="muted">Word 2016 va yangilari, Microsoft 365, Word Online (brauzer), Mac</span>
+        </div>
+
+        <div class="word-tabs" role="tablist">
+          <button class="wtab active" data-wtab="web" role="tab">Word Online</button>
+          <button class="wtab" data-wtab="win" role="tab">Windows</button>
+          <button class="wtab" data-wtab="mac" role="tab">Mac</button>
+          <button class="wtab" data-wtab="org" role="tab">Tashkilot uchun</button>
+        </div>
+
+        <ol class="word-steps" data-wpane="web">
+          <li><a href="https://www.office.com/launch/word" target="_blank" rel="noopener">office.com</a> orqali Word’ni brauzerda oching va hujjat yarating.</li>
+          <li><b>Bosh sahifa</b> (Home) → <b>Qoʻshimchalar</b> (Add-ins) → <b>Boshqa qoʻshimchalar</b> (More Add-ins).</li>
+          <li><b>Mening qoʻshimchalarim</b> (My Add-ins) → <b>Mening qoʻshimchamni yuklash</b> (Upload My Add-in).</li>
+          <li>Yuklab olingan <code>manifest.xml</code> faylini tanlang va <b>Yuklash</b> (Upload) ni bosing.</li>
+          <li>Lentada <b>«Yangi Alifbo»</b> tugmasi paydo boʻladi.</li>
+        </ol>
+
+        <ol class="word-steps" data-wpane="win" hidden>
+          <li>Kompyuterda papka yarating, masalan <code>C:\YangiAlifbo</code>, va <code>manifest.xml</code> ni shu papkaga joylang.</li>
+          <li>Papka ustida sichqonchaning oʻng tugmasi → <b>Xususiyatlar</b> (Properties) → <b>Ruxsat</b> (Sharing) → <b>Ulashish</b> (Share).
+            Koʻrsatilgan tarmoq manzilini nusxalang (masalan, <code>\\KOMPYUTER\YangiAlifbo</code>).</li>
+          <li>Word’da: <b>Fayl</b> → <b>Parametrlar</b> (Options) → <b>Ishonch markazi</b> (Trust Center) → <b>Ishonch markazi parametrlari</b>
+            → <b>Ishonchli qoʻshimchalar katalogi</b> (Trusted Add-in Catalogs).</li>
+          <li>Tarmoq manzilini <b>Katalog manzili</b> maydoniga qoʻying → <b>Katalog qoʻshish</b> → <b>Menyuda koʻrsatish</b> belgisini qoʻying → <b>OK</b>. Word’ni qayta ishga tushiring.</li>
+          <li><b>Bosh sahifa</b> → <b>Qoʻshimchalar</b> → <b>Boshqa qoʻshimchalar</b> → <b>Umumiy papka</b> (Shared Folder) → <b>Yangi Alifbo</b> → <b>Qoʻshish</b>.</li>
+        </ol>
+
+        <ol class="word-steps" data-wpane="mac" hidden>
+          <li>Finder’da <b>Oʻtish</b> (Go) → <b>Papkaga oʻtish</b> (Go to Folder) ni tanlang va quyidagi manzilni kiriting:
+            <code class="block">~/Library/Containers/com.microsoft.Word/Data/Documents/wef</code>
+            (<code>wef</code> papkasi boʻlmasa, uni yarating).</li>
+          <li><code>manifest.xml</code> faylini shu papkaga nusxalang.</li>
+          <li>Word’ni qayta ishga tushiring → <b>Qoʻyish</b> (Insert) → <b>Qoʻshimchalar</b> → <b>Mening qoʻshimchalarim</b> → <b>Yangi Alifbo</b>.</li>
+        </ol>
+
+        <ol class="word-steps" data-wpane="org" hidden>
+          <li>Tashkilotda (institutda) Microsoft 365 boʻlsa, qoʻshimchani administrator barcha xodimlarga markazdan oʻrnatib berishi mumkin.</li>
+          <li><b>Microsoft 365 administrator markazi</b> → <b>Sozlamalar</b> (Settings) → <b>Integratsiyalangan ilovalar</b> (Integrated apps) → <b>Maxsus ilovalarni yuklash</b> (Upload custom apps).</li>
+          <li><code>manifest.xml</code> faylini yuklang, foydalanuvchilarni tanlang va <b>Joylashtirish</b> (Deploy) ni bosing.</li>
+          <li>Bir necha soat ichida qoʻshimcha barcha tanlangan xodimlarning Word dasturida paydo boʻladi.</li>
+        </ol>
+
+        <div class="word-note">
+          <svg class="i"><use href="#i-info"/></svg>
+          <span>Qoʻshimcha hujjat matnini faqat sizning Word’ingiz ichida oʻgiradi — hujjat hech qayerga yuborilmaydi.
+            Natija yoqmasa, <kbd>Ctrl</kbd>+<kbd>Z</kbd> bilan bekor qiling. Ishlashi uchun internet aloqasi kerak.</span>
+        </div>
       </div>
     </div>
   </div>

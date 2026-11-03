@@ -1,0 +1,67 @@
+/* Yangi Alifbo — Word qo'shimchasi paneli (tor: ~320–450 px) */
+body.pane { font-size: 14px; min-height: 100vh; background: var(--bg); }
+.pane-head {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  background: var(--masthead); color: var(--masthead-text);
+}
+.pane-head b { display: block; font-size: .95rem; letter-spacing: .12em; }
+.pane-head small { display: block; font-size: .75rem; color: var(--masthead-muted); }
+.pane-logo {
+  width: 34px; height: 34px; flex: 0 0 auto; display: grid; place-items: center;
+  border: 1.5px solid rgba(255, 255, 255, .55); border-radius: 6px; font-weight: 800; font-size: 17px;
+}
+.pane-head + .flagline { height: 6px; }
+
+.pane-main { flex: 1; padding: 14px; }
+#app { display: flex; flex-direction: column; gap: 14px; }
+#app[hidden] { display: none; }
+
+.pane-row { display: flex; align-items: flex-end; gap: 8px; }
+.pane-row .field { flex: 1 1 0; min-width: 0; }
+.pane-row .field select { min-width: 0; width: 100%; }
+.pane-row .btn-square { flex: 0 0 auto; height: 38px; width: 38px; }
+
+.pane-actions { display: flex; flex-direction: column; gap: 8px; }
+.pane-actions .btn { width: 100%; height: 40px; justify-content: flex-start; padding: 0 14px; }
+.pane-actions .btn.primary { justify-content: center; }
+.btn:disabled { opacity: .55; cursor: progress; }
+
+.pane-status {
+  display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; font-size: .85rem;
+  background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--ok); border-radius: var(--radius-sm);
+}
+.pane-status .i { width: 16px; height: 16px; margin-top: 1px; color: var(--ok); flex: 0 0 auto; }
+.pane-status.error { border-left-color: var(--danger); }
+.pane-status.error .i { color: var(--danger); }
+.pane-status.info { border-left-color: var(--accent); }
+.pane-status.info .i { color: var(--accent); }
+
+.pane-progress { height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; }
+.pane-progress i { display: block; height: 100%; width: 0; background: var(--primary); transition: width .15s; }
+
+.pane-settings {
+  border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); padding: 0 12px;
+}
+.pane-settings summary { padding: 10px 0; cursor: pointer; font-size: .85rem; font-weight: 600; color: var(--muted); }
+.pane-settings[open] { padding-bottom: 12px; }
+.pane-settings .field { margin-bottom: 10px; }
+.pane-settings .field select { width: 100%; min-width: 0; }
+
+.pane-notes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: .8rem; color: var(--muted); }
+.pane-notes li { display: flex; gap: 8px; align-items: flex-start; }
+.pane-notes .i { width: 15px; height: 15px; margin-top: 1px; color: var(--ok); flex: 0 0 auto; }
+
+.pane-msg {
+  display: flex; gap: 10px; padding: 14px; background: var(--surface);
+  border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: var(--radius-sm); font-size: .88rem;
+}
+.pane-msg .i { color: var(--accent); flex: 0 0 auto; }
+.pane-msg b { display: block; margin-bottom: 4px; }
+.pane-msg a { color: var(--accent); text-decoration: underline; }
+
+.pane-foot {
+  display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; font-size: .74rem;
+  color: var(--muted); border-top: 1px solid var(--border); background: var(--surface-2);
+}
+.pane-foot b { color: var(--text); font-weight: 600; }
+.pane-foot a { color: var(--accent); margin-top: 4px; }

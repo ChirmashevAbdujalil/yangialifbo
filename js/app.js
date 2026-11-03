@@ -849,6 +849,26 @@
   $('settingsBtn').onclick = function () { openModal('settingsModal'); };
   $('helpBtn').onclick = function () { openModal('helpModal'); };
 
+  /* Word qo'shimchasi: yo'riqnoma oynasi */
+  function showWordTab(name) {
+    document.querySelectorAll('#wordModal .wtab').forEach(function (b) {
+      var on = b.dataset.wtab === name;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    document.querySelectorAll('#wordModal [data-wpane]').forEach(function (p) { p.hidden = p.dataset.wpane !== name; });
+  }
+  document.querySelectorAll('#wordModal .wtab').forEach(function (b) {
+    b.onclick = function () { showWordTab(b.dataset.wtab); };
+  });
+  $('wordBtn').onclick = function () {
+    var ua = navigator.userAgent || '';
+    showWordTab(/Macintosh|Mac OS X/.test(ua) && !/iPhone|iPad/.test(ua) ? 'mac' : 'web');
+    openModal('wordModal');
+  };
+  // Word panelidagi "yo'riqnoma" havolasi: sayt#word
+  if (location.hash === '#word') setTimeout(function () { $('wordBtn').click(); }, 0);
+
   function bindSetting(id, key, after) {
     $(id).onchange = function () {
       S[key] = this.type === 'checkbox' ? this.checked : this.value;
