@@ -193,17 +193,19 @@
     var ads = [];
     var chosen = {};
     var tracking = false;
+    var trackUrl = null;
     var viewed = {};
     var lastClick = {};
 
     /* --- Statistika: ko'rish va bosishlarni serverga yuborish (faqat PHP hostingda) --- */
     function send(id, ev) {
       if (!tracking || navigator.webdriver) return;
-      var fd = new FormData();
+      // application/x-www-form-urlencoded — PHP ham, Vercel ham tushunadi
+      var fd = new URLSearchParams();
       fd.append('ad', id);
       fd.append('e', ev);
-      try { if (navigator.sendBeacon && navigator.sendBeacon('ads/track.php', fd)) return; } catch (e) {}
-      try { fetch('ads/track.php', { method: 'POST', body: fd, keepalive: true }).catch(function () {}); } catch (e) {}
+      try { if (navigator.sendBeacon && navigator.sendBeacon(trackUrl, fd)) return; } catch (e) {}
+      try { fetch(trackUrl, { method: 'POST', body: fd, keepalive: true }).catch(function () {}); } catch (e) {}
     }
     /* Ko'rish: reklamaning kamida yarmi 1 soniya ekranda tursa (sahifa ochilishida bir marta) */
     function watch(slot, ad) {
@@ -284,11 +286,28 @@
       });
     }
 
+    function getJson(url) {
+      return fetch(url, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; });
+    }
+
     fetch('ads.json', { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
+        // Vercel: reklamalar serverdagi bazada — "remote" manzildan olinadi.
+        // PHP/statik hostingda u manzil bo'lmasa, ads.json ning o'zi ishlatiladi.
+        if (data && typeof data.remote === 'string' && /^api\/[a-z-]+$/.test(data.remote)) {
+          return getJson(data.remote).then(function (r) {
+            return r && Array.isArray(r.ads) ? r : data;
+          }, function () { return data; });
+        }
+        return data;
+      })
+      .then(function (data) {
         var day = today();
-        tracking = !!(data && data.tracking === true);
+        // tracking: true — PHP (ads/track.php); "api/track" — Vercel
+        trackUrl = data && data.tracking === true ? 'ads/track.php'
+          : (data && typeof data.tracking === 'string' && /^api\/[a-z-]+$/.test(data.tracking) ? data.tracking : null);
+        tracking = !!trackUrl;
         ads = (data && Array.isArray(data.ads) ? data.ads : []).filter(function (a) {
           return status(a, day) === 'active' && SLOTS[a.slot];
         });

@@ -1,0 +1,7 @@
+# Vercel'da PHP ishlamaydi — PHP fayllar joylanmaydi (ular oddiy matn sifatida ko'rinib qolmasligi uchun).
+# Vercel'da admin panel va statistika api/ papkasidagi Node.js funksiyalari orqali ishlaydi.
+*.php
+admin/data/
+admin/.htaccess
+ads/uploads/.htaccess
+promo/source/

@@ -317,3 +317,6 @@ body.admin .toast { bottom: 84px; }
   .inline-bar { display: none; }
   .bar-cell { min-width: 0; }
 }
+
+/* Vercel sozlash qadamlari */
+.mode-box .setup-steps { margin: 6px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }

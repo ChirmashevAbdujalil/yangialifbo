@@ -75,7 +75,7 @@ Dasturchi: **Abdujalil Chirmashev** · Dastur homiysi: **Andijon davlat texnika 
 - Reklama ustida “Reklama” yozuvi turadi, havolalar `rel="sponsored"` bilan ochiladi.
 - Boshqaruv paneli: `sayt-manzili/admin/`
 
-### Reklama statistikasi (PHP hostingda)
+### Reklama statistikasi (Vercel yoki PHP hostingda)
 - Har bir reklama uchun **koʻrishlar**, **bosishlar** va **CTR** (bosish ulushi) kunlar boʻyicha.
 - Admin paneldagi “Statistika” boʻlimi: davr (7 / 30 / 90 kun, 12 oy), reklama boʻyicha filtr,
   koʻrsatkich kartochkalari, kunlik (12 oyda — oylik) grafik, jadval koʻrinishi,
@@ -109,6 +109,8 @@ admin/            — reklama boshqaruv paneli (admin/save.php — PHP boʻlsa)
 admin/stats.js    — statistika boʻlimi
 admin/lib.php     — statistika ombori (PHP)
 admin/data/       — statistika fayli (server yozishi mumkin boʻlishi kerak)
+api/              — Vercel server funksiyalari (admin panel, reklamalar, statistika, rasmlar)
+.vercelignore     — Vercel’ga joylanmaydigan fayllar (PHP)
 og-image.png      — ijtimoiy tarmoqlarda havola ulashilganda chiqadigan rasm
 word-addin/       — Microsoft Word qoʻshimchasi: manifest.xml, panel (taskpane.*), ikonkalar
 promo/            — reklama posteri (16:9 PNG) va uning manbasi
@@ -126,7 +128,23 @@ python3 -m http.server 8080
 
 ## Admin panelni sozlash
 
-Panel ikki rejimda ishlaydi va qaysi biri ekanini oʻzi aniqlaydi.
+Panel uch xil hostingda ishlaydi va qaysi biri ekanini oʻzi aniqlaydi: **Vercel**, **PHP** yoki **statik**.
+
+**0. Vercel (sayt hozir shu yerda: https://yangialifbouz.vercel.app)** — admin panel ham, statistika ham ishlaydi:
+
+1. Vercel → loyiha → **Storage** → **Upstash for Redis** (bepul tarif) → **Create** / **Connect Project**.
+   `KV_REST_API_URL` va `KV_REST_API_TOKEN` kalitlari avtomatik qoʻshiladi.
+2. Vercel → loyiha → **Settings** → **Environment Variables** → `ADMIN_PASSWORD` = kamida 10 belgili parol.
+   (Ixtiyoriy: `SESSION_SECRET` — uzun tasodifiy matn.)
+3. **Deployments** → oxirgi joylash → **Redeploy**.
+4. `https://yangialifbouz.vercel.app/admin/` — parol bilan kiring. Saqlangan oʻzgarishlar ~30 soniyada saytda koʻrinadi.
+
+Qanday ishlaydi: `api/` papkasidagi Node.js funksiyalari (`admin`, `ads`, `track`, `ad-image`) PHP versiyasi
+bilan bir xil vazifani bajaradi; reklamalar, rasmlar (brauzerda 700 KB gacha siqiladi) va statistika
+Upstash Redis’da saqlanadi. Parol repoda emas, Vercel sozlamalarida turadi. Tashqi kutubxona kerak emas.
+`.vercelignore` PHP fayllarni Vercel’ga joylamaydi.
+Upstash bepul tarifining oylik soʻrovlar chegarasi bor (joriy shartlarni Upstash saytida tekshiring):
+har bir reklama koʻrish/bosish ~4 ta soʻrov; reklamalar roʻyxati CDN’da 30 soniya keshlanadi.
 
 **1. PHP qoʻllaydigan hosting (cPanel, oddiy Apache/Nginx + PHP)** — eng qulayi:
 

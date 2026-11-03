@@ -13,6 +13,8 @@
   var A = window.UzAds;
   var $ = function (id) { return document.getElementById(id); };
   var API = 'save.php';
+  var backend = 'php';      // 'vercel' | 'php' — server rejimida qaysi server ishlayotgani
+  var MAX_UPLOAD = 700 * 1024;
   var DRAFT_KEY = 'ya_admin_draft';
   var MAX_EMBED = 400 * 1024; // statik rejimda faylga joylanadigan rasm hajmi chegarasi
 
@@ -257,6 +259,18 @@
       $(target).value = v.length > 120 ? '(faylga joylangan rasm, ' + Math.round(f.size / 1024) + ' KB)' : v;
       changed();
     };
+    if (mode === 'server' && backend === 'vercel') {
+      toast('Rasm tayyorlanmoqda…', 'info');
+      prepareImage(f).then(function (img) {
+        return api('upload', { method: 'POST', body: JSON.stringify(img), headers: { 'Content-Type': 'application/json' } });
+      }).then(function (j) {
+        setVal(j.url);
+        toast('Rasm yuklandi');
+      }, function (e) {
+        toast(e.message === 'too_large' ? 'Rasm juda katta — kichikroq rasm tanlang' : 'Rasmni yuklab boʻlmadi', 'error');
+      });
+      return;
+    }
     if (mode === 'server') {
       var fd = new FormData();
       fd.append('image', f);
@@ -271,6 +285,53 @@
     var r = new FileReader();
     r.onload = function () { setVal(String(r.result)); toast('Rasm joylandi'); };
     r.readAsDataURL(f);
+  }
+
+  /* Vercel uchun: rasmni brauzerda kichraytirish/siqish (700 KB gacha), base64 ko'rinishda qaytarish */
+  function readB64(blob) {
+    return new Promise(function (resolve, reject) {
+      var r = new FileReader();
+      r.onload = function () { resolve(String(r.result).split(',')[1] || ''); };
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+  }
+  function prepareImage(f) {
+    if (f.type === 'image/gif') {
+      // GIF animatsiyasi buzilmasligi uchun o'zgarishsiz yuboriladi
+      if (f.size > MAX_UPLOAD) return Promise.reject(new Error('too_large'));
+      return readB64(f).then(function (d) { return { type: f.type, data: d }; });
+    }
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(f);
+      var img = new Image();
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('bad_type')); };
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var scale = Math.min(1, 1600 / img.naturalWidth);
+        if (scale === 1 && f.size <= MAX_UPLOAD) {
+          readB64(f).then(function (d) { resolve({ type: f.type, data: d }); }, reject);
+          return;
+        }
+        var c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * scale);
+        c.height = Math.round(img.naturalHeight * scale);
+        var g = c.getContext('2d');
+        var tries = [['image/webp', 0.88], ['image/webp', 0.75], ['image/jpeg', 0.82], ['image/jpeg', 0.65]];
+        (function next(i) {
+          if (i >= tries.length) { reject(new Error('too_large')); return; }
+          g.clearRect(0, 0, c.width, c.height);
+          if (tries[i][0] === 'image/jpeg') { g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); }
+          g.drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(function (bl) {
+            if (bl && bl.type === tries[i][0] && bl.size <= MAX_UPLOAD) {
+              readB64(bl).then(function (d) { resolve({ type: bl.type, data: d }); }, reject);
+            } else next(i + 1);
+          }, tries[i][0], tries[i][1]);
+        })(0);
+      };
+      img.src = url;
+    });
   }
 
   /* Uzun data-URL'larni maydonda qisqa ko'rsatish */
@@ -412,7 +473,7 @@
       savedJson = json();
       store(DRAFT_KEY, null);
       updateSaveState();
-      toast('Saytga saqlandi. Oʻzgarishlar darhol koʻrinadi');
+      toast(backend === 'vercel' ? 'Saytga saqlandi. Oʻzgarishlar 30 soniya ichida koʻrinadi' : 'Saytga saqlandi. Oʻzgarishlar darhol koʻrinadi');
     }, function (e) {
       btn.disabled = false;
       if (e.status === 401) { toast('Sessiya tugagan — qayta kiring', 'error'); showLogin(); }
@@ -485,8 +546,10 @@
     setView('ads');
     $('saveBtn').hidden = mode !== 'server';
     $('logoutBtn').hidden = mode !== 'server';
-    fetch('../ads.json', { cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.json() : { ads: [] }; })
+    var source = mode === 'server' && backend === 'vercel'
+      ? api('ads').then(function (j) { return j.data; })
+      : fetch('../ads.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : { ads: [] }; });
+    source
       .catch(function () { return { ads: [] }; })
       .then(function (site) {
         setData(site, true);
@@ -519,17 +582,49 @@
     });
   });
 
+  /* Qaysi server borligini aniqlash: avval Vercel (/api/admin), so'ng PHP (save.php) */
+  function detectServer() {
+    API = '../api/admin';
+    return api('ping').then(function (j) {
+      if (j.mode !== 'vercel') throw new Error('not-vercel');
+      backend = 'vercel';
+      return j;
+    }).catch(function () {
+      API = 'save.php';
+      backend = 'php';
+      return api('ping');
+    });
+  }
+
+  function vercelSetupHtml(j) {
+    var steps = [];
+    if (!j.storage) {
+      steps.push('<li><b>Maʼlumotlar bazasini ulang:</b> Vercel → loyihangiz → <b>Storage</b> → <b>Upstash for Redis</b> (bepul) → <b>Create</b> / <b>Connect</b>. ' +
+        'Kerakli kalitlar (<code>KV_REST_API_URL</code>, <code>KV_REST_API_TOKEN</code>) avtomatik qoʻshiladi.</li>');
+    }
+    if (!j.password) {
+      steps.push('<li><b>Parol oʻrnating:</b> Vercel → loyihangiz → <b>Settings</b> → <b>Environment Variables</b> → nomi <code>ADMIN_PASSWORD</code>, ' +
+        'qiymati — kamida 10 belgidan iborat parol.</li>');
+    }
+    steps.push('<li>Vercel’da <b>Deployments</b> → oxirgi joylash → <b>Redeploy</b> ni bosing va shu sahifani yangilang.</li>');
+    return '<svg class="i"><use href="#i-alert"/></svg><div><b>Vercel sozlamalari tugallanmagan.</b> Admin panel va statistika ishlashi uchun:' +
+      '<ol class="setup-steps">' + steps.join('') + '</ol></div>';
+  }
+
   function init() {
     bindForm();
-    api('ping').then(function (j) {
+    detectServer().then(function (j) {
       mode = 'server';
       if (!j.configured) {
-        showMode('<svg class="i"><use href="#i-alert"/></svg><div><b>Parol oʻrnatilmagan.</b> Serverdagi <code>admin/config.php</code> faylini oching va ' +
+        if (backend === 'vercel') showMode(vercelSetupHtml(j), 'warn');
+        else showMode('<svg class="i"><use href="#i-alert"/></svg><div><b>Parol oʻrnatilmagan.</b> Serverdagi <code>admin/config.php</code> faylini oching va ' +
           '<code>ADMIN_PASSWORD</code> qiymatiga kamida 10 belgidan iborat parol yozing. Shundan soʻng sahifani yangilang.</div>', 'warn');
         return;
       }
-      showMode('<svg class="i"><use href="#i-server"/></svg><div><b>Server rejimi.</b> “Saytga saqlash” tugmasi bosilganda oʻzgarishlar darhol saytda koʻrinadi.' +
-        (j.writable ? '' : ' <b class="text-danger">Diqqat: serverda ads.json fayliga yozish huquqi yoʻq.</b>') + '</div>', 'ok');
+      showMode(backend === 'vercel'
+        ? '<svg class="i"><use href="#i-server"/></svg><div><b>Server rejimi (Vercel).</b> “Saytga saqlash” tugmasi bosilganda oʻzgarishlar 30 soniya ichida saytda koʻrinadi. Statistika yigʻiladi.</div>'
+        : '<svg class="i"><use href="#i-server"/></svg><div><b>Server rejimi.</b> “Saytga saqlash” tugmasi bosilganda oʻzgarishlar darhol saytda koʻrinadi.' +
+          (j.writable ? '' : ' <b class="text-danger">Diqqat: serverda ads.json fayliga yozish huquqi yoʻq.</b>') + '</div>', 'ok');
       if (j.logged) { csrf = j.csrf; startWorkspace(); } else showLogin();
     }, function () {
       mode = 'static';
